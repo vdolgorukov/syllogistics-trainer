@@ -110,6 +110,14 @@ code{font-family:ui-monospace,Menlo,monospace}
 .fm{font-family:"Times New Roman",Georgia,serif;font-style:italic;font-size:1.05em;white-space:nowrap}
 .imtab td,.imtab th{text-align:center;font-family:"Times New Roman",Georgia,serif}
 .imtab th{font-family:inherit;font-size:.85rem}
+.square{margin:8px 0 12px;text-align:center}
+.square svg{width:100%;max-width:420px;height:auto}
+.square figcaption{font-size:.85rem;color:var(--muted);margin-top:4px}
+.sqnode rect{fill:var(--sq-node)}
+.sqnode text{fill:var(--ink);font:italic bold 24px "Times New Roman",Georgia,serif;text-anchor:middle}
+:root{--sq-blue:#0055fa;--sq-red:#d62828;--sq-green:#2e9b3e;--sq-node:#d9e3fb}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sq-blue:#6f9cff;--sq-red:#ff6b6b;--sq-green:#5fd27a;--sq-node:#2a3a5c}}
+:root[data-theme="dark"]{--sq-blue:#6f9cff;--sq-red:#ff6b6b;--sq-green:#5fd27a;--sq-node:#2a3a5c}
 </style>
 </head>
 <body>
@@ -404,6 +412,30 @@ code{font-family:ui-monospace,Menlo,monospace}
     <details class="box">
       <summary>Справка: логический квадрат и непосредственные умозаключения</summary>
       <p><b>Логический квадрат</b> (предполагается, что S ≠ ∅):</p>
+      <figure class="square">
+        <svg viewBox="0 0 520 300" role="img" aria-label="Логический квадрат: SAP и SEP вверху, SiP и SoP внизу">
+          <defs>
+            <marker id="sqArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" style="fill:var(--ink)"/>
+            </marker>
+          </defs>
+          <g style="stroke-width:4;fill:none;stroke-linecap:round">
+            <line x1="140" y1="60"  x2="380" y2="60"  style="stroke:var(--sq-blue)"/>
+            <line x1="140" y1="84"  x2="380" y2="216" style="stroke:var(--sq-red)"/>
+            <line x1="380" y1="84"  x2="140" y2="216" style="stroke:var(--sq-red)"/>
+            <line x1="140" y1="240" x2="380" y2="240" style="stroke:var(--sq-green)"/>
+            <line x1="90"  y1="84"  x2="90"  y2="212" style="stroke:var(--ink)" marker-end="url(#sqArrow)"/>
+            <line x1="430" y1="84"  x2="430" y2="212" style="stroke:var(--ink)" marker-end="url(#sqArrow)"/>
+          </g>
+          <g class="sqnode">
+            <rect x="40"  y="37"  width="100" height="46" rx="8"/><text x="90"  y="68">SAP</text>
+            <rect x="380" y="37"  width="100" height="46" rx="8"/><text x="430" y="68">SEP</text>
+            <rect x="40"  y="217" width="100" height="46" rx="8"/><text x="90"  y="248">SiP</text>
+            <rect x="380" y="217" width="100" height="46" rx="8"/><text x="430" y="248">SoP</text>
+          </g>
+        </svg>
+        <figcaption>Логический квадрат: чёрные стрелки — подчинение; синяя линия — контрарность; красные линии — контрадикторность; зелёная линия — субконтрарность. Предполагается, что S ≠ ∅.</figcaption>
+      </figure>
       <ul>
         <li><b>подчинение</b> (A → i, E → o): если истинно общее, истинно и частное; если ложно частное, ложно и общее;</li>
         <li><b>контрарность</b> (A — E): не могут быть одновременно истинными, но могут быть одновременно ложными;</li>
