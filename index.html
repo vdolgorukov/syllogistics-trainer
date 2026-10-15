@@ -139,51 +139,7 @@ code{font-family:ui-monospace,Menlo,monospace}
     <span class="chip">Лучшая серия: <b id="stBest">0</b></span>
   </div>
 
-  <details class="box">
-    <summary>Настройки</summary>
-    <div class="opts">
-      <label><input type="checkbox" id="optSwap"> посылки в произвольном порядке</label>
-      <label>Термины
-        <select id="optLex" style="width:auto">
-          <option value="normal">естественные (все физики — учёные)</option>
-          <option value="counter">контрфактические (все крокодилы летают)</option>
-          <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
-          <option value="letters">буквенные (X, Y, Z)</option>
-        </select>
-      </label>
-      <label><input type="checkbox" id="optStrict"> требовать все нарушенные правила</label>
-    </div>
-  </details>
 
-  <details class="box">
-    <summary>Справка: фигуры, типы суждений, правила</summary>
-    <p><b>Термины.</b> Меньший (S) — субъект заключения; больший (P) — предикат заключения; средний (M) — есть в обеих посылках, в заключении его нет. Посылка с P — <i>большая</i>, посылка с S — <i>меньшая</i>.</p>
-    <table>
-      <tr><th>Тип</th><th>Суждение</th><th>S распределён</th><th>P распределён</th></tr>
-      <tr><td>A</td><td>Все S являются P</td><td>да</td><td>нет</td></tr>
-      <tr><td>E</td><td>Никакие S не являются P</td><td>да</td><td>да</td></tr>
-      <tr><td>I</td><td>Некоторые S являются P</td><td>нет</td><td>нет</td></tr>
-      <tr><td>O</td><td>Некоторые S не являются P</td><td>нет</td><td>да</td></tr>
-    </table>
-    <p></p>
-    <table>
-      <tr><th>Фигура</th><th>I</th><th>II</th><th>III</th><th>IV</th></tr>
-      <tr><td>Большая посылка</td><td>M – P</td><td>P – M</td><td>M – P</td><td>P – M</td></tr>
-      <tr><td>Меньшая посылка</td><td>S – M</td><td>S – M</td><td>M – S</td><td>M – S</td></tr>
-      <tr><td>Заключение</td><td colspan="4">S – P</td></tr>
-    </table>
-    <p class="note">Связка может быть разной: «Все S являются P» или «Все S — P» (и «Никакие S не P», «Некоторые S не P» без связки) — тип суждения от этого не меняется.</p>
-    <p><b>Модус</b> — тройка типов суждений: большая посылка, меньшая посылка, заключение (например, AAI).</p>
-    <p><b>Общие правила.</b></p>
-    <ol id="rulesRef"></ol>
-    <p class="note">Правильность силлогизма определяется только его формой: истинность посылок по существу не оценивается. Чтобы потренироваться отделять форму от содержания, в настройках можно выбрать контрфактические («Все крокодилы летают») или бессмысленные («Все трямзики — кракозябры») термины.</p>
-    <p><b>Непустота терминов и ослабленные модусы.</b> Как и в традиционной силлогистике, все термины считаются <b>непустыми</b>: предполагается, что предметы, о которых идёт речь, существуют. Поэтому из общего суждения следует частное («Все S являются P» ⇒ «Некоторые S являются P»), и правильными признаются 24 модуса, а не 15:</p>
-    <ul>
-      <li><b>ослабленные модусы</b> дают частное заключение там, где можно было вывести общее: Barbari (I, AAI), Celaront (I, EAO), Cesaro (II, EAO), Camestrop (II, AEO), Camenop (IV, AEO);</li>
-      <li>модусы, где из двух общих посылок выводится частное заключение, а общего вывода нет: Darapti (III, AAI), Felapton (III, EAO), Bramantip (IV, AAI), Fesapo (IV, EAO).</li>
-    </ul>
-    <p class="note">Если допускать пустые термины (как в современной логике), эти 9 модусов перестают быть правильными. Общие правила силлогизма неявно опираются на непустоту терминов, поэтому в тренажёре они считаются правильными.</p>
-  </details>
 
   <div class="card">
     <h2>Силлогизм <span class="note" id="qNo"></span></h2>
@@ -245,6 +201,50 @@ code{font-family:ui-monospace,Menlo,monospace}
   </div>
 
   <div class="card hidden" id="explain"></div>
+  <details class="box">
+    <summary>Настройки</summary>
+    <div class="opts">
+      <label><input type="checkbox" id="optSwap"> посылки в произвольном порядке</label>
+      <label>Термины
+        <select id="optLex" style="width:auto">
+          <option value="normal">естественные (все физики — учёные)</option>
+          <option value="counter">контрфактические (все крокодилы летают)</option>
+          <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
+          <option value="letters">буквенные (X, Y, Z)</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="optStrict"> требовать все нарушенные правила</label>
+    </div>
+  </details>
+  <details class="box">
+    <summary>Справка: фигуры, типы суждений, правила</summary>
+    <p><b>Термины.</b> Меньший (S) — субъект заключения; больший (P) — предикат заключения; средний (M) — есть в обеих посылках, в заключении его нет. Посылка с P — <i>большая</i>, посылка с S — <i>меньшая</i>.</p>
+    <table>
+      <tr><th>Тип</th><th>Суждение</th><th>S распределён</th><th>P распределён</th></tr>
+      <tr><td>A</td><td>Все S являются P</td><td>да</td><td>нет</td></tr>
+      <tr><td>E</td><td>Никакие S не являются P</td><td>да</td><td>да</td></tr>
+      <tr><td>I</td><td>Некоторые S являются P</td><td>нет</td><td>нет</td></tr>
+      <tr><td>O</td><td>Некоторые S не являются P</td><td>нет</td><td>да</td></tr>
+    </table>
+    <p></p>
+    <table>
+      <tr><th>Фигура</th><th>I</th><th>II</th><th>III</th><th>IV</th></tr>
+      <tr><td>Большая посылка</td><td>M – P</td><td>P – M</td><td>M – P</td><td>P – M</td></tr>
+      <tr><td>Меньшая посылка</td><td>S – M</td><td>S – M</td><td>M – S</td><td>M – S</td></tr>
+      <tr><td>Заключение</td><td colspan="4">S – P</td></tr>
+    </table>
+    <p class="note">Связка может быть разной: «Все S являются P» или «Все S — P» (и «Никакие S не P», «Некоторые S не P» без связки) — тип суждения от этого не меняется.</p>
+    <p><b>Модус</b> — тройка типов суждений: большая посылка, меньшая посылка, заключение (например, AAI).</p>
+    <p><b>Общие правила.</b></p>
+    <ol id="rulesRef"></ol>
+    <p class="note">Правильность силлогизма определяется только его формой: истинность посылок по существу не оценивается. Чтобы потренироваться отделять форму от содержания, в настройках можно выбрать контрфактические («Все крокодилы летают») или бессмысленные («Все трямзики — кракозябры») термины.</p>
+    <p><b>Непустота терминов и ослабленные модусы.</b> Как и в традиционной силлогистике, все термины считаются <b>непустыми</b>: предполагается, что предметы, о которых идёт речь, существуют. Поэтому из общего суждения следует частное («Все S являются P» ⇒ «Некоторые S являются P»), и правильными признаются 24 модуса, а не 15:</p>
+    <ul>
+      <li><b>ослабленные модусы</b> дают частное заключение там, где можно было вывести общее: Barbari (I, AAI), Celaront (I, EAO), Cesaro (II, EAO), Camestrop (II, AEO), Camenop (IV, AEO);</li>
+      <li>модусы, где из двух общих посылок выводится частное заключение, а общего вывода нет: Darapti (III, AAI), Felapton (III, EAO), Bramantip (IV, AAI), Fesapo (IV, EAO).</li>
+    </ul>
+    <p class="note">Если допускать пустые термины (как в современной логике), эти 9 модусов перестают быть правильными. Общие правила силлогизма неявно опираются на непустоту терминов, поэтому в тренажёре они считаются правильными.</p>
+  </details>
   </div>
 
   <div id="tab2" class="hidden">
@@ -255,33 +255,7 @@ code{font-family:ui-monospace,Menlo,monospace}
       <span class="chip">Лучшая серия: <b id="enBest">0</b></span>
     </div>
 
-    <details class="box">
-      <summary>Настройки</summary>
-      <div class="opts">
-        <label>Термины
-          <select id="enLex" style="width:auto">
-            <option value="normal">естественные (все физики — учёные)</option>
-            <option value="counter">контрфактические (все крокодилы летают)</option>
-            <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
-            <option value="letters">буквенные (X, Y, Z)</option>
-          </select>
-        </label>
-      </div>
-    </details>
 
-    <details class="box">
-      <summary>Справка: как восстанавливать энтимему</summary>
-      <p><b>Энтимема</b> — сокращённый силлогизм, в котором пропущена одна из посылок или заключение.</p>
-      <p>Чтобы восстановить её, нужно найти суждение, которое вместе с имеющимися образует <b>правильный</b> силлогизм: определите термины и фигуру, а затем проверьте кандидата по общим правилам:</p>
-      <ol id="enRulesRef"></ol>
-      <p class="note">Верных вариантов может быть несколько (например, суждения E и I обратимы, а из общего суждения следует частное). Иногда ни одно суждение с данными терминами не даёт правильного силлогизма — тогда энтимему восстановить нельзя.</p>
-      <p><b>Непустота терминов и ослабленные модусы.</b> Как и в традиционной силлогистике, все термины считаются <b>непустыми</b>: предполагается, что предметы, о которых идёт речь, существуют. Поэтому из общего суждения следует частное («Все S являются P» ⇒ «Некоторые S являются P»), и правильными признаются 24 модуса, а не 15:</p>
-      <ul>
-        <li><b>ослабленные модусы</b> дают частное заключение там, где можно было вывести общее: Barbari (I, AAI), Celaront (I, EAO), Cesaro (II, EAO), Camestrop (II, AEO), Camenop (IV, AEO);</li>
-        <li>модусы, где из двух общих посылок выводится частное заключение, а общего вывода нет: Darapti (III, AAI), Felapton (III, EAO), Bramantip (IV, AAI), Fesapo (IV, EAO).</li>
-      </ul>
-      <p class="note">Если допускать пустые термины (как в современной логике), эти 9 модусов перестают быть правильными. Общие правила силлогизма неявно опираются на непустоту терминов, поэтому в тренажёре они считаются правильными.</p>
-    </details>
 
     <div class="card">
       <h2>Энтимема <span class="note" id="enNo"></span></h2>
@@ -300,6 +274,32 @@ code{font-family:ui-monospace,Menlo,monospace}
     </div>
 
     <div class="card hidden" id="enExplain"></div>
+    <details class="box">
+      <summary>Настройки</summary>
+      <div class="opts">
+        <label>Термины
+          <select id="enLex" style="width:auto">
+            <option value="normal">естественные (все физики — учёные)</option>
+            <option value="counter">контрфактические (все крокодилы летают)</option>
+            <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
+            <option value="letters">буквенные (X, Y, Z)</option>
+          </select>
+        </label>
+      </div>
+    </details>
+    <details class="box">
+      <summary>Справка: как восстанавливать энтимему</summary>
+      <p><b>Энтимема</b> — сокращённый силлогизм, в котором пропущена одна из посылок или заключение.</p>
+      <p>Чтобы восстановить её, нужно найти суждение, которое вместе с имеющимися образует <b>правильный</b> силлогизм: определите термины и фигуру, а затем проверьте кандидата по общим правилам:</p>
+      <ol id="enRulesRef"></ol>
+      <p class="note">Верных вариантов может быть несколько (например, суждения E и I обратимы, а из общего суждения следует частное). Иногда ни одно суждение с данными терминами не даёт правильного силлогизма — тогда энтимему восстановить нельзя.</p>
+      <p><b>Непустота терминов и ослабленные модусы.</b> Как и в традиционной силлогистике, все термины считаются <b>непустыми</b>: предполагается, что предметы, о которых идёт речь, существуют. Поэтому из общего суждения следует частное («Все S являются P» ⇒ «Некоторые S являются P»), и правильными признаются 24 модуса, а не 15:</p>
+      <ul>
+        <li><b>ослабленные модусы</b> дают частное заключение там, где можно было вывести общее: Barbari (I, AAI), Celaront (I, EAO), Cesaro (II, EAO), Camestrop (II, AEO), Camenop (IV, AEO);</li>
+        <li>модусы, где из двух общих посылок выводится частное заключение, а общего вывода нет: Darapti (III, AAI), Felapton (III, EAO), Bramantip (IV, AAI), Fesapo (IV, EAO).</li>
+      </ul>
+      <p class="note">Если допускать пустые термины (как в современной логике), эти 9 модусов перестают быть правильными. Общие правила силлогизма неявно опираются на непустоту терминов, поэтому в тренажёре они считаются правильными.</p>
+    </details>
   </div>
 
   <div id="tab3" class="hidden">
@@ -310,6 +310,25 @@ code{font-family:ui-monospace,Menlo,monospace}
       <span class="chip">Лучшая серия: <b id="sorBest">0</b></span>
     </div>
 
+
+
+    <div class="card">
+      <h2>Сорит <span class="note" id="sorNo"></span></h2>
+      <div class="syl" id="sorSyl"></div>
+    </div>
+
+    <div class="card" id="sorForm">
+      <h3 style="margin:0 0 4px;font-size:1rem">Какое суждение можно восстановить?</h3>
+      <p class="note" style="margin:0 0 10px">Выберите все подходящие варианты: каждый должен превращать сорит в правильное рассуждение.</p>
+      <div class="rules" id="sorOpts"></div>
+      <div class="actions">
+        <button class="primary" id="sorCheck" disabled>Проверить</button>
+        <button id="sorSkip">Новое задание</button>
+        <button class="primary hidden" id="sorNext">Новое задание →</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="sorExplain"></div>
     <details class="box">
       <summary>Настройки</summary>
       <div class="opts">
@@ -330,7 +349,6 @@ code{font-family:ui-monospace,Menlo,monospace}
         </label>
       </div>
     </details>
-
     <details class="box">
       <summary>Справка: как восстанавливать сорит</summary>
       <p><b>Сорит</b> — сложносокращённый силлогизм: цепочка силлогизмов, в которой промежуточные заключения пропущены. Соседние посылки имеют общий термин, а заключение связывает первый и последний термины цепочки.</p>
@@ -343,24 +361,6 @@ code{font-family:ui-monospace,Menlo,monospace}
       <p class="note">Для сорита в стандартной форме (как в примерах выше) есть удобные частные правила. В аристотелевом сорите отрицательной может быть только последняя посылка, а частной — только первая. В гоклениевом — наоборот: отрицательной может быть только первая, частной — только последняя.</p>
       <p class="note">Все термины считаются непустыми, поэтому допускаются и ослабленные модусы. Верных вариантов может быть несколько, а может не быть ни одного — тогда сорит восстановить нельзя.</p>
     </details>
-
-    <div class="card">
-      <h2>Сорит <span class="note" id="sorNo"></span></h2>
-      <div class="syl" id="sorSyl"></div>
-    </div>
-
-    <div class="card" id="sorForm">
-      <h3 style="margin:0 0 4px;font-size:1rem">Какое суждение можно восстановить?</h3>
-      <p class="note" style="margin:0 0 10px">Выберите все подходящие варианты: каждый должен превращать сорит в правильное рассуждение.</p>
-      <div class="rules" id="sorOpts"></div>
-      <div class="actions">
-        <button class="primary" id="sorCheck" disabled>Проверить</button>
-        <button id="sorSkip">Новое задание</button>
-        <button class="primary hidden" id="sorNext">Новое задание →</button>
-      </div>
-    </div>
-
-    <div class="card hidden" id="sorExplain"></div>
   </div>
 
   <div id="tab4" class="hidden">
@@ -371,6 +371,23 @@ code{font-family:ui-monospace,Menlo,monospace}
       <span class="chip">Лучшая серия: <b id="imBest">0</b></span>
     </div>
 
+
+
+    <div class="card">
+      <h2>Суждение <span class="note" id="imNo"></span></h2>
+      <div class="syl" id="imGiven"></div>
+    </div>
+
+    <div class="card" id="imForm">
+      <div id="imSections"></div>
+      <div class="actions">
+        <button class="primary" id="imCheck" disabled>Проверить</button>
+        <button id="imSkip">Новое задание</button>
+        <button class="primary hidden" id="imNext">Новое задание →</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="imExplain"></div>
     <details class="box">
       <summary>Настройки</summary>
       <div class="opts">
@@ -384,7 +401,6 @@ code{font-family:ui-monospace,Menlo,monospace}
         </label>
       </div>
     </details>
-
     <details class="box">
       <summary>Справка: логический квадрат и непосредственные умозаключения</summary>
       <p><b>Логический квадрат</b> (предполагается, что S ≠ ∅):</p>
@@ -413,22 +429,6 @@ code{font-family:ui-monospace,Menlo,monospace}
       </ul>
       <p class="note">× — умозаключение этого вида сделать нельзя (на одном из шагов требуется обратить суждение типа o).</p>
     </details>
-
-    <div class="card">
-      <h2>Суждение <span class="note" id="imNo"></span></h2>
-      <div class="syl" id="imGiven"></div>
-    </div>
-
-    <div class="card" id="imForm">
-      <div id="imSections"></div>
-      <div class="actions">
-        <button class="primary" id="imCheck" disabled>Проверить</button>
-        <button id="imSkip">Новое задание</button>
-        <button class="primary hidden" id="imNext">Новое задание →</button>
-      </div>
-    </div>
-
-    <div class="card hidden" id="imExplain"></div>
   </div>
 </div>
 
