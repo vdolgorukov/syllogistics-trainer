@@ -215,7 +215,8 @@ code{font-family:ui-monospace,Menlo,monospace}
       <label><input type="checkbox" id="optSwap"> посылки в произвольном порядке</label>
       <label>Термины
         <select id="optLex" style="width:auto">
-          <option value="normal">естественные (все физики — учёные)</option>
+          <option value="mix" selected>вперемешку: естественные, контрфактические, бессмысленные</option>
+            <option value="normal">естественные (все физики — учёные)</option>
           <option value="counter">контрфактические (все крокодилы летают)</option>
           <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
           <option value="letters">буквенные (X, Y, Z)</option>
@@ -287,6 +288,7 @@ code{font-family:ui-monospace,Menlo,monospace}
       <div class="opts">
         <label>Термины
           <select id="enLex" style="width:auto">
+            <option value="mix" selected>вперемешку: естественные, контрфактические, бессмысленные</option>
             <option value="normal">естественные (все физики — учёные)</option>
             <option value="counter">контрфактические (все крокодилы летают)</option>
             <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
@@ -342,6 +344,7 @@ code{font-family:ui-monospace,Menlo,monospace}
       <div class="opts">
         <label>Термины
           <select id="sorLex" style="width:auto">
+            <option value="mix" selected>вперемешку: естественные, контрфактические, бессмысленные</option>
             <option value="normal">естественные (все физики — учёные)</option>
             <option value="counter">контрфактические (все крокодилы летают)</option>
             <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
@@ -401,6 +404,7 @@ code{font-family:ui-monospace,Menlo,monospace}
       <div class="opts">
         <label>Термины
           <select id="imLex" style="width:auto">
+            <option value="mix" selected>вперемешку: естественные, контрфактические, бессмысленные</option>
             <option value="normal">естественные (все физики — учёные)</option>
             <option value="counter">контрфактические (все крокодилы летают)</option>
             <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
@@ -722,6 +726,7 @@ function solveNatural(roles, props, strict){
 // Имена терминов в порядке roles. В режиме «естественные» сначала требуем истинности всех суждений,
 // затем — только видимых (например, посылок неправильного силлогизма).
 function chooseTerms(mode, roles, props, visible){
+  if(mode==='mix') mode = pick(['normal','counter','nonsense']);
   if(mode==='normal'){
     const vis = props.filter((_,i) => visible.includes(i));
     for(const [ps, strict] of [[props,true],[props,false],[vis,true],[vis,false]]){
