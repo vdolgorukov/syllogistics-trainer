@@ -1358,8 +1358,10 @@ function renderImmediate(){
   let h = '<div class="step" data-sec="sq"><h3>1. Логический квадрат</h3>'+
     '<p class="note" style="margin:0 0 8px">Пусть это суждение <b>'+(im.val ? 'истинно' : 'ложно')+'</b>. Что из этого следует? Выберите все верные варианты.</p><div class="rules">';
   im.sq.forEach((o,k) => {
-    h += '<label class="opt"><input type="checkbox" name="im-sq" value="'+k+'"><span>'+quoted({type:o.x, s:'S', p:'P'})+
-         ' — <b>'+(o.v ? 'истинно' : 'ложно')+'</b><small class="why"></small></span></label>';
+    // истинное — просто суждение, ложное — «Неверно, что …»
+    const text = propHTML({type:o.x, s:'S', p:'P'}, im.terms, false);
+    const body = o.v ? text : 'Неверно, что '+text.charAt(0).toLowerCase()+text.slice(1);
+    h += '<label class="opt"><input type="checkbox" name="im-sq" value="'+k+'"><span>'+body+'.<small class="why"></small></span></label>';
   });
   h += '<label class="opt"><input type="checkbox" name="im-sq" value="none"><span><b>По логическому квадрату ничего вывести нельзя</b><small class="why"></small></span></label></div><div class="fb"></div></div>';
   TRANS.forEach((tr,i) => {
