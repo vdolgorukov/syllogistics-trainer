@@ -90,7 +90,7 @@ th,td{border:1px solid var(--line);padding:5px 8px;text-align:left}
 th{background:var(--accent-soft)}
 code{font-family:ui-monospace,Menlo,monospace}
 
-.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px}
 .tabs button{border:0;border-bottom:3px solid transparent;border-radius:8px 8px 0 0;background:transparent;color:var(--muted);padding:9px 18px;font-weight:600}
 .tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
 .blank{display:inline-block;min-width:120px;padding:0 10px;border:2px dashed var(--muted);border-radius:8px;color:var(--muted);text-align:center}
@@ -106,6 +106,10 @@ code{font-family:ui-monospace,Menlo,monospace}
 .themes button+button{border-left:1.5px solid var(--line)}
 .themes button:hover{color:var(--accent)}
 .themes button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.ov{text-decoration:overline}
+.fm{font-family:"Times New Roman",Georgia,serif;font-style:italic;font-size:1.05em;white-space:nowrap}
+.imtab td,.imtab th{text-align:center;font-family:"Times New Roman",Georgia,serif}
+.imtab th{font-family:inherit;font-size:.85rem}
 </style>
 </head>
 <body>
@@ -124,6 +128,7 @@ code{font-family:ui-monospace,Menlo,monospace}
     <button role="tab" id="tabBtn1" aria-selected="true">Силлогизм</button>
     <button role="tab" id="tabBtn2" aria-selected="false">Энтимема</button>
     <button role="tab" id="tabBtn3" aria-selected="false">Сорит</button>
+    <button role="tab" id="tabBtn4" aria-selected="false">Непосредственные умозаключения</button>
   </div>
 
   <div id="tab1">
@@ -234,8 +239,8 @@ code{font-family:ui-monospace,Menlo,monospace}
 
     <div class="actions">
       <button class="primary" id="btnCheck" disabled>Проверить</button>
-      <button id="btnSkip">Пропустить</button>
-      <button class="primary hidden" id="btnNext">Следующий силлогизм →</button>
+      <button id="btnSkip">Новое задание</button>
+      <button class="primary hidden" id="btnNext">Новое задание →</button>
     </div>
   </div>
 
@@ -289,8 +294,8 @@ code{font-family:ui-monospace,Menlo,monospace}
       <div class="rules" id="enOpts"></div>
       <div class="actions">
         <button class="primary" id="enCheck" disabled>Проверить</button>
-        <button id="enSkip">Пропустить</button>
-        <button class="primary hidden" id="enNext">Следующая энтимема →</button>
+        <button id="enSkip">Новое задание</button>
+        <button class="primary hidden" id="enNext">Новое задание →</button>
       </div>
     </div>
 
@@ -350,12 +355,80 @@ code{font-family:ui-monospace,Menlo,monospace}
       <div class="rules" id="sorOpts"></div>
       <div class="actions">
         <button class="primary" id="sorCheck" disabled>Проверить</button>
-        <button id="sorSkip">Пропустить</button>
-        <button class="primary hidden" id="sorNext">Следующий сорит →</button>
+        <button id="sorSkip">Новое задание</button>
+        <button class="primary hidden" id="sorNext">Новое задание →</button>
       </div>
     </div>
 
     <div class="card hidden" id="sorExplain"></div>
+  </div>
+
+  <div id="tab4" class="hidden">
+    <div class="stats">
+      <span class="chip">Решено: <b id="imN">0</b></span>
+      <span class="chip">Полностью верно: <b id="imOk">0</b></span>
+      <span class="chip">Серия: <b id="imStreak">0</b></span>
+      <span class="chip">Лучшая серия: <b id="imBest">0</b></span>
+    </div>
+
+    <details class="box">
+      <summary>Настройки</summary>
+      <div class="opts">
+        <label>Термины
+          <select id="imLex" style="width:auto">
+            <option value="normal">естественные (все физики — учёные)</option>
+            <option value="counter">контрфактические (все крокодилы летают)</option>
+            <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
+            <option value="letters">буквенные (X, Y, Z)</option>
+          </select>
+        </label>
+      </div>
+    </details>
+
+    <details class="box">
+      <summary>Справка: логический квадрат и непосредственные умозаключения</summary>
+      <p><b>Логический квадрат</b> (предполагается, что S ≠ ∅):</p>
+      <ul>
+        <li><b>подчинение</b> (A → i, E → o): если истинно общее, истинно и частное; если ложно частное, ложно и общее;</li>
+        <li><b>контрарность</b> (A — E): не могут быть одновременно истинными, но могут быть одновременно ложными;</li>
+        <li><b>контрадикторность</b> (A — o, E — i): всегда имеют противоположные значения;</li>
+        <li><b>субконтрарность</b> (i — o): не могут быть одновременно ложными, но могут быть одновременно истинными.</li>
+      </ul>
+      <p><b>Непосредственные умозаключения</b> (<span class="ov">P</span> — «не-P», понятие, противоречащее P):</p>
+      <div style="overflow-x:auto">
+      <table class="imtab">
+        <tr><th></th><th>Обращение</th><th>Превращение</th><th>Противопоставление субъекту</th><th>Противопоставление предикату</th><th>Чистое противопоставление</th></tr>
+        <tr><td>SAP</td><td>PiS</td><td>SE<span class="ov">P</span></td><td>Po<span class="ov">S</span></td><td><span class="ov">P</span>ES</td><td><span class="ov">P</span>A<span class="ov">S</span></td></tr>
+        <tr><td>SEP</td><td>PES</td><td>SA<span class="ov">P</span></td><td>PA<span class="ov">S</span></td><td><span class="ov">P</span>iS</td><td><span class="ov">P</span>o<span class="ov">S</span></td></tr>
+        <tr><td>SiP</td><td>PiS</td><td>So<span class="ov">P</span></td><td>Po<span class="ov">S</span></td><td>×</td><td>×</td></tr>
+        <tr><td>SoP</td><td>×</td><td>Si<span class="ov">P</span></td><td>×</td><td><span class="ov">P</span>iS</td><td><span class="ov">P</span>o<span class="ov">S</span></td></tr>
+      </table>
+      </div>
+      <ul>
+        <li><b>Обращение</b>: субъект и предикат меняются местами, качество сохраняется. SAP обращается с ограничением (в PiS), SoP не обращается.</li>
+        <li><b>Превращение</b>: меняется качество суждения, а предикат заменяется на противоречащее понятие.</li>
+        <li><b>Противопоставление субъекту</b> = превращение обращения.</li>
+        <li><b>Противопоставление предикату</b> = обращение превращения.</li>
+        <li><b>Чистое противопоставление</b> = превращение противопоставления предикату = превращение обращения превращения.</li>
+      </ul>
+      <p class="note">× — умозаключение этого вида сделать нельзя (на одном из шагов требуется обратить суждение типа o).</p>
+    </details>
+
+    <div class="card">
+      <h2>Суждение <span class="note" id="imNo"></span></h2>
+      <div class="syl" id="imGiven"></div>
+    </div>
+
+    <div class="card" id="imForm">
+      <div id="imSections"></div>
+      <div class="actions">
+        <button class="primary" id="imCheck" disabled>Проверить</button>
+        <button id="imSkip">Новое задание</button>
+        <button class="primary hidden" id="imNext">Новое задание →</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="imExplain"></div>
   </div>
 </div>
 
@@ -650,7 +723,9 @@ function styleOf(pr, terms){
   return h % 3;
 }
 function propHTML(pr, terms, marks){
-  const T = TYPES[pr.type], st = styleOf(pr, terms);
+  const T = TYPES[pr.type];
+  let st = styleOf(pr, terms);
+  if(st===2 && /^не-/.test(terms[pr.p])) st = 1;   // не «не не-P»
   const s = termHTML(terms[pr.s], T.sd, marks);
   const p = termHTML(terms[pr.p], T.pd, marks);
   const pi = termHTML(INS[terms[pr.p]] || terms[pr.p], T.pd, marks);
@@ -1007,12 +1082,13 @@ function checkEnth(){
 }
 
 function showTab(n){
-  for(const k of [1,2,3]){
+  for(const k of [1,2,3,4]){
     $('tab'+k).classList.toggle('hidden', n!==k);
     $('tabBtn'+k).setAttribute('aria-selected', n===k);
   }
 }
 $('tabBtn3').addEventListener('click', ()=>showTab(3));
+$('tabBtn4').addEventListener('click', ()=>showTab(4));
 $('tabBtn1').addEventListener('click', ()=>showTab(1));
 $('tabBtn2').addEventListener('click', ()=>showTab(2));
 $('enRulesRef').innerHTML = RULES.map(r=>'<li>'+r.rule+'</li>').join('');
@@ -1194,6 +1270,201 @@ $('sorSkip').addEventListener('click', newSorites);
 $('sorLex').addEventListener('change', newSorites);
 $('sorCount').addEventListener('change', newSorites);
 newSorites();
+</script>
+<script>
+// ---------- Непосредственные умозаключения ----------
+// Термины: S, P и их дополнения nS, nP (не-S, не-P).
+const NEG = t => t[0]==='n' ? t.slice(1) : 'n'+t;
+const LOW = {A:'A', E:'E', I:'i', O:'o'};
+const CONTRA = {A:'O', O:'A', E:'I', I:'E'};
+const fmtTerm = t => t[0]==='n' ? '<span class="ov">'+t.slice(1)+'</span>' : t;
+const fmtProp = pr => '<span class="fm">'+fmtTerm(pr.s)+LOW[pr.type]+fmtTerm(pr.p)+'</span>';
+const conv = pr => pr.type==='O' ? null : {type: pr.type==='A' ? 'I' : pr.type, s:pr.p, p:pr.s};
+const obv  = pr => ({type:{A:'E', E:'A', I:'O', O:'I'}[pr.type], s:pr.s, p:NEG(pr.p)});
+const STEP_NAME = {conv:'обращение', obv:'превращение'};
+const TRANS = [
+  {id:'conv', title:'Обращение',                    steps:['conv']},
+  {id:'obv',  title:'Превращение',                  steps:['obv']},
+  {id:'cS',   title:'Противопоставление субъекту',  steps:['conv','obv']},
+  {id:'cP',   title:'Противопоставление предикату', steps:['obv','conv']},
+  {id:'pure', title:'Чистое противопоставление',    steps:['obv','conv','obv']}
+];
+function applySteps(pr, steps){
+  const trace = [pr]; let cur = pr;
+  for(const st of steps){
+    const nx = st==='conv' ? conv(cur) : obv(cur);
+    if(!nx) return {res:null, trace, fail:st};
+    trace.push(nx); cur = nx;
+  }
+  return {res:cur, trace};
+}
+const SQ_REL = {AE:'контрарность', EA:'контрарность', AO:'контрадикторность', OA:'контрадикторность',
+  EI:'контрадикторность', IE:'контрадикторность', IO:'субконтрарность', OI:'субконтрарность',
+  AI:'подчинение', IA:'подчинение', EO:'подчинение', OE:'подчинение'};
+// Значение суждения типа x, если суждение типа g истинно (val=true) или ложно; null — неопределённо.
+function squareValue(g, val, x){
+  if(CONTRA[g]===x) return !val;
+  if(val){
+    if((g==='A' && x==='I') || (g==='E' && x==='O')) return true;
+    if((g==='A' && x==='E') || (g==='E' && x==='A')) return false;
+  } else {
+    if((g==='I' && x==='A') || (g==='O' && x==='E')) return false;
+    if((g==='I' && x==='O') || (g==='O' && x==='I')) return true;
+  }
+  return null;
+}
+
+function transOptions(given, tr){
+  const r = applySteps(given, tr.steps).res;
+  const out = [], seen = new Set([propKey(given)]);
+  if(r) seen.add(propKey(r));
+  const add = x => { if(x && !seen.has(propKey(x))){ seen.add(propKey(x)); out.push(x); } };
+  // типичные ошибки: обращение без ограничения, «превращение» без смены качества
+  let cur = given;
+  for(const st of tr.steps) cur = st==='conv' ? {type:cur.type, s:cur.p, p:cur.s} : obv(cur);
+  add(cur);
+  add({type:given.type, s:given.s, p:NEG(given.p)});
+  for(const t2 of TRANS) if(t2.id!==tr.id) add(applySteps(given, t2.steps).res);
+  if(r){
+    for(const t of 'AEIO') add({...r, type:t});
+    add({type:r.type, s:r.p, p:r.s});
+    add({...r, p:NEG(r.p)});
+    add({...r, s:NEG(r.s)});
+  }
+  const picked = shuffle(out).slice(0, r ? 3 : 4);
+  return {correct:r, opts:shuffle(r ? picked.concat([r]) : picked)};
+}
+
+let im = null;
+const imStats = {n:0, ok:0, streak:0, best:0};
+
+function newImmediate(){
+  const type = pick('AEIO'.split('')), val = Math.random()<0.6;
+  const given = {type, s:'S', p:'P'};
+  const [nS, nP] = chooseTerms($('imLex').value, ['S','P'], [{type: val ? type : CONTRA[type], s:'S', p:'P'}], [0]);
+  const terms = {S:nS, P:nP, nS:'не-'+nS, nP:'не-'+nP, _seed:Math.random()};
+  for(const x of [nS,nP]) INS['не-'+x] = 'не-'+(INS[x] || x);
+  const sq = [];
+  for(const x of 'AEIO') if(x!==type) for(const v of [true,false]) sq.push({x, v, ok: squareValue(type, val, x)===v});
+  im = {given, val, terms, sq:shuffle(sq), tr:{}, locked:false};
+  for(const tr of TRANS) im.tr[tr.id] = transOptions(given, tr);
+  renderImmediate();
+}
+
+const quoted = pr => '«'+propHTML(pr, im.terms, false)+'»';
+
+function renderImmediate(){
+  $('imGiven').innerHTML = '<div class="prem"><span class="n">!</span><div>'+propHTML(im.given, im.terms, false)+'.</div></div>';
+  $('imNo').textContent = '№ '+(imStats.n+1);
+  let h = '<div class="step" data-sec="sq"><h3>1. Логический квадрат</h3>'+
+    '<p class="note" style="margin:0 0 8px">Пусть это суждение <b>'+(im.val ? 'истинно' : 'ложно')+'</b>. Что из этого следует? Выберите все верные варианты.</p><div class="rules">';
+  im.sq.forEach((o,k) => {
+    h += '<label class="opt"><input type="checkbox" name="im-sq" value="'+k+'"><span>'+quoted({type:o.x, s:'S', p:'P'})+
+         ' — <b>'+(o.v ? 'истинно' : 'ложно')+'</b><small class="why"></small></span></label>';
+  });
+  h += '<label class="opt"><input type="checkbox" name="im-sq" value="none"><span><b>По логическому квадрату ничего вывести нельзя</b><small class="why"></small></span></label></div><div class="fb"></div></div>';
+  TRANS.forEach((tr,i) => {
+    h += '<div class="step" data-sec="'+tr.id+'"><h3>'+(i+2)+'. '+tr.title+'</h3><div class="rules">';
+    im.tr[tr.id].opts.forEach((o,k) => {
+      h += '<label class="opt"><input type="radio" name="im-'+tr.id+'" value="'+k+'"><span>'+quoted(o)+'<small class="why"></small></span></label>';
+    });
+    h += '<label class="opt"><input type="radio" name="im-'+tr.id+'" value="none"><span><b>Это умозаключение сделать нельзя</b><small class="why"></small></span></label></div><div class="fb"></div></div>';
+  });
+  $('imSections').innerHTML = h;
+  $('imExplain').classList.add('hidden');
+  $('imNext').classList.add('hidden');
+  $('imCheck').classList.remove('hidden');
+  $('imSkip').classList.remove('hidden');
+  $('imCheck').disabled = true;
+}
+
+function imChange(ev){
+  if(im.locked) return;
+  const t = ev.target;
+  if(t.name==='im-sq' && t.checked) document.querySelectorAll('input[name=im-sq]').forEach(i => {
+    if(i!==t && ((t.value==='none') !== (i.value==='none'))) i.checked = false;
+  });
+  const secs = ['sq', ...TRANS.map(t=>t.id)];
+  $('imCheck').disabled = !secs.every(id => document.querySelector('input[name=im-'+id+']:checked'));
+}
+
+function traceText(given, tr){
+  const {res, trace, fail} = applySteps(given, tr.steps);
+  let h = fmtProp(trace[0]);
+  for(let i=1;i<trace.length;i++) h += ' → ('+STEP_NAME[tr.steps[i-1]]+') '+fmtProp(trace[i]);
+  if(!res) h += ' → ('+STEP_NAME[fail]+') ×: суждение типа o не обращается';
+  return h;
+}
+
+function markOpt(inp, correct, text){
+  const lab = inp.closest('label');
+  lab.querySelector('.why').innerHTML = text || '';
+  lab.classList.add(correct ? (inp.checked ? 'good' : 'miss') : (inp.checked ? 'wrong' : 'plain'));
+  inp.disabled = true;
+}
+
+function checkImmediate(){
+  const res = {};
+  const g = im.given;
+  // квадрат
+  {
+    const inputs = [...document.querySelectorAll('input[name=im-sq]')];
+    let ok = true;
+    inputs.forEach(inp => {
+      if(inp.value==='none'){ markOpt(inp, false, 'Неверно: по контрадикторности значение противоречащего суждения определено всегда.'); if(inp.checked) ok = false; return; }
+      const o = im.sq[+inp.value];
+      if(o.ok!==inp.checked) ok = false;
+      markOpt(inp, o.ok, o.ok ? '✓ '+SQ_REL[g.type+o.x] : '');
+    });
+    res.sq = ok;
+    const lines = 'AEIO'.split('').filter(x=>x!==g.type).map(x => {
+      const v = squareValue(g.type, im.val, x);
+      return fmtProp({type:x, s:'S', p:'P'})+' — '+(v===null ? 'неопределённо' : '<b>'+(v?'истинно':'ложно')+'</b>')+' ('+SQ_REL[g.type+x]+')';
+    });
+    const fb = document.querySelector('[data-sec=sq] .fb');
+    fb.className = 'fb show '+(ok?'ok':'bad');
+    fb.innerHTML = (ok ? 'Верно. ' : 'Есть ошибка. ')+'Если '+fmtProp(g)+' '+(im.val?'истинно':'ложно')+': '+lines.join('; ')+'.';
+    document.querySelector('[data-sec=sq]').classList.add(ok?'ok':'bad');
+  }
+  // преобразования
+  for(const tr of TRANS){
+    const T = im.tr[tr.id];
+    const sel = document.querySelector('input[name=im-'+tr.id+']:checked');
+    const ok = T.correct ? (sel && sel.value!=='none' && T.opts[+sel.value]===T.correct) : (sel && sel.value==='none');
+    res[tr.id] = ok;
+    document.querySelectorAll('input[name=im-'+tr.id+']').forEach(inp => {
+      const correct = inp.value==='none' ? !T.correct : T.opts[+inp.value]===T.correct;
+      markOpt(inp, correct, '');
+    });
+    const fb = document.querySelector('[data-sec='+tr.id+'] .fb');
+    fb.className = 'fb show '+(ok?'ok':'bad');
+    fb.innerHTML = (ok ? 'Верно: ' : 'Правильно: ')+(T.correct ? quoted(T.correct)+'. ' : 'это умозаключение сделать нельзя. ')+traceText(g, tr)+'.';
+    document.querySelector('[data-sec='+tr.id+']').classList.add(ok?'ok':'bad');
+  }
+
+  const all = Object.values(res).every(Boolean);
+  imStats.n++;
+  if(all){imStats.ok++; imStats.streak++; imStats.best=Math.max(imStats.best,imStats.streak);} else imStats.streak=0;
+  $('imN').textContent=imStats.n; $('imOk').textContent=imStats.ok;
+  $('imStreak').textContent=imStats.streak; $('imBest').textContent=imStats.best;
+  const nOk = Object.values(res).filter(Boolean).length;
+  $('imExplain').innerHTML = '<div class="verdict '+(all?'ok':'bad')+'">'+(all ? 'Всё верно!' : 'Верно '+nOk+' из 6 — разбор под каждым пунктом.')+'</div>'+
+    '<p class="note" style="margin:0">Исходное суждение: '+fmtProp(g)+'. Обозначения: <span class="fm"><span class="ov">S</span></span> — «не-S», <span class="fm"><span class="ov">P</span></span> — «не-P».</p>';
+  $('imExplain').classList.remove('hidden');
+
+  im.locked = true;
+  $('imCheck').classList.add('hidden');
+  $('imSkip').classList.add('hidden');
+  $('imNext').classList.remove('hidden');
+  $('imNext').focus();
+}
+
+$('imSections').addEventListener('change', imChange);
+$('imCheck').addEventListener('click', checkImmediate);
+$('imNext').addEventListener('click', newImmediate);
+$('imSkip').addEventListener('click', newImmediate);
+$('imLex').addEventListener('change', newImmediate);
+newImmediate();
 </script>
 <script>
 // ---------- Тема оформления ----------
