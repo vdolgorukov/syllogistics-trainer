@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тренажёр по силлогистике</title>
+<style>
+:root{
+  --bg:#f6f5f1; --card:#ffffff; --ink:#1d1d1b; --muted:#6b6a64; --line:#dcdad2;
+  --accent:#2f5d9e; --accent-ink:#ffffff; --accent-soft:#e6edf7;
+  --ok:#1f7a3d; --ok-bg:#e5f4ea; --bad:#b3261e; --bad-bg:#fbe9e7; --warn:#8a5a00; --warn-bg:#fdf1d8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16171a; --card:#202225; --ink:#ececea; --muted:#9a9a94; --line:#383a3f;
+    --accent:#7fa8e6; --accent-ink:#101418; --accent-soft:#25303f;
+    --ok:#6fcf8f; --ok-bg:#1d3326; --bad:#ff8a80; --bad-bg:#3a2321; --warn:#f0c36a; --warn-bg:#3a3018;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:780px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.5rem;margin:0 0 4px}
+h2{font-size:1.05rem;margin:0 0 10px}
+.sub{color:var(--muted);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:.9rem;color:var(--muted)}
+.chip b{color:var(--ink)}
+details.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 18px;margin-bottom:14px}
+details.box summary{cursor:pointer;font-weight:600}
+details.box[open] summary{margin-bottom:10px}
+.opts{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center}
+.opts label{display:flex;gap:6px;align-items:center}
+.syl{font-size:1.1rem}
+.prem{display:flex;gap:12px;align-items:baseline;padding:6px 0}
+.prem .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:.85rem;font-weight:700;text-align:center;line-height:24px}
+.concl{border-top:2px solid var(--ink);margin-top:6px;padding-top:8px}
+.concl .n{background:transparent;color:var(--ink)}
+.t{font-weight:600}
+sup.dp{color:var(--ok);font-weight:700}
+sup.dm{color:var(--bad);font-weight:700}
+.step{border-top:1px solid var(--line);padding:14px 0 6px}
+.step:first-of-type{border-top:0}
+.step h3{margin:0 0 8px;font-size:1rem}
+.step.ok h3::after{content:" ✓";color:var(--ok)}
+.step.bad h3::after{content:" ✗";color:var(--bad)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:620px){.grid3{grid-template-columns:1fr}}
+.field label.l{display:block;font-size:.85rem;color:var(--muted);margin-bottom:2px}
+select{width:100%;font:inherit;padding:7px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+select:focus-visible,input:focus-visible+label{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{min-width:64px;text-align:center;padding:7px 14px;border:1px solid var(--line);border-radius:8px;cursor:pointer;background:var(--card);user-select:none}
+.seg input:checked+label{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.seg input:disabled+label{cursor:default;opacity:.75}
+.rules{display:grid;gap:6px}
+.rules label{display:flex;gap:8px;align-items:flex-start;padding:6px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+.rules input{margin-top:5px}
+.fb{margin:8px 0 4px;font-size:.93rem;display:none}
+.fb.show{display:block}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)} .fb.warn{color:var(--warn)}
+.actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+button{font:inherit;padding:9px 20px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+button:disabled{opacity:.45;cursor:not-allowed}
+.hidden{display:none!important}
+.verdict{padding:10px 14px;border-radius:8px;font-weight:600;margin:0 0 12px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok)}
+.verdict.bad{background:var(--bad-bg);color:var(--bad)}
+.std .row{display:flex;gap:10px;align-items:baseline;padding:4px 0;flex-wrap:wrap}
+.std .lbl{flex:none;width:130px;color:var(--muted);font-size:.9rem}
+.std .sch{margin-left:auto;font-family:ui-monospace,Menlo,monospace;color:var(--muted);font-size:.9rem}
+.rl{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:6px}
+.rl li{padding:7px 10px;border-radius:8px;font-size:.93rem;background:var(--ok-bg);color:var(--ok)}
+.rl li.v{background:var(--bad-bg);color:var(--bad)}
+.rl li small{display:block;color:var(--ink);opacity:.85}
+.note{color:var(--muted);font-size:.88rem}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left}
+th{background:var(--accent-soft)}
+code{font-family:ui-monospace,Menlo,monospace}
+
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.tabs button{border:0;border-bottom:3px solid transparent;border-radius:8px 8px 0 0;background:transparent;color:var(--muted);padding:9px 18px;font-weight:600}
+.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.blank{display:inline-block;min-width:120px;padding:0 10px;border:2px dashed var(--muted);border-radius:8px;color:var(--muted);text-align:center}
+.opt>span{flex:1;min-width:0}
+.opt .why{display:block;margin-top:3px;font-size:.88rem;color:var(--muted)}
+.opt.good{border-color:var(--ok);background:var(--ok-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opt.miss{border-color:var(--warn);background:var(--warn-bg)}
+.std+.std{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Тренажёр по силлогистике</h1>
+  <p class="sub">Тренажёр по категорическим силлогизмам.</p>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tabBtn1" aria-selected="true">Силлогизм</button>
+    <button role="tab" id="tabBtn2" aria-selected="false">Энтимема</button>
+  </div>
+
+  <div id="tab1">
+  <div class="stats">
+    <span class="chip">Решено: <b id="stN">0</b></span>
+    <span class="chip">Полностью верно: <b id="stOk">0</b></span>
+    <span class="chip">Серия: <b id="stStreak">0</b></span>
+    <span class="chip">Лучшая серия: <b id="stBest">0</b></span>
+  </div>
+
+  <details class="box">
+    <summary>Настройки</summary>
+    <div class="opts">
+      <label><input type="checkbox" id="optSwap"> посылки в произвольном порядке</label>
+      <label><input type="checkbox" id="optLetters"> буквенные термины (X, Y, Z)</label>
+      <label><input type="checkbox" id="optStrict"> требовать все нарушенные правила</label>
+    </div>
+  </details>
+
+  <details class="box">
+    <summary>Справка: фигуры, типы суждений, правила</summary>
+    <p><b>Термины.</b> Меньший (S) — субъект заключения; больший (P) — предикат заключения; средний (M) — есть в обеих посылках, в заключении его нет. Посылка с P — <i>большая</i>, посылка с S — <i>меньшая</i>.</p>
+    <table>
+      <tr><th>Тип</th><th>Суждение</th><th>S распределён</th><th>P распределён</th></tr>
+      <tr><td>A</td><td>Все S суть P</td><td>да</td><td>нет</td></tr>
+      <tr><td>E</td><td>Никакие S не суть P</td><td>да</td><td>да</td></tr>
+      <tr><td>I</td><td>Некоторые S суть P</td><td>нет</td><td>нет</td></tr>
+      <tr><td>O</td><td>Некоторые S не суть P</td><td>нет</td><td>да</td></tr>
+    </table>
+    <p></p>
+    <table>
+      <tr><th>Фигура</th><th>I</th><th>II</th><th>III</th><th>IV</th></tr>
+      <tr><td>Большая посылка</td><td>M – P</td><td>P – M</td><td>M – P</td><td>P – M</td></tr>
+      <tr><td>Меньшая посылка</td><td>S – M</td><td>S – M</td><td>M – S</td><td>M – S</td></tr>
+      <tr><td>Заключение</td><td colspan="4">S – P</td></tr>
+    </table>
+    <p class="note">Связка может быть разной: «Все S суть P», «Все S являются P», «Все S — P» (и «Никакие S не P», «Некоторые S не P» без связки) — тип суждения от этого не меняется.</p>
+    <p><b>Модус</b> — тройка типов суждений: большая посылка, меньшая посылка, заключение (например, AAI).</p>
+    <p><b>Общие правила.</b></p>
+    <ol id="rulesRef"></ol>
+    <p class="note">Правильность силлогизма определяется только его формой: истинность посылок по существу не оценивается.</p>
+    <p><b>Непустота терминов и ослабленные модусы.</b> Как и в традиционной силлогистике, все термины считаются <b>непустыми</b>: предполагается, что предметы, о которых идёт речь, существуют. Поэтому из общего суждения следует частное («Все S суть P» ⇒ «Некоторые S суть P»), и правильными признаются 24 модуса, а не 15:</p>
+    <ul>
+      <li><b>ослабленные модусы</b> дают частное заключение там, где можно было вывести общее: Barbari (I, AAI), Celaront (I, EAO), Cesaro (II, EAO), Camestrop (II, AEO), Camenop (IV, AEO);</li>
+      <li>модусы, где из двух общих посылок выводится частное заключение, а общего вывода нет: Darapti (III, AAI), Felapton (III, EAO), Bramantip (IV, AAI), Fesapo (IV, EAO).</li>
+    </ul>
+    <p class="note">Если допускать пустые термины (как в современной логике), эти 9 модусов перестают быть правильными. Общие правила силлогизма неявно опираются на непустоту терминов, поэтому в тренажёре они считаются правильными.</p>
+  </details>
+
+  <div class="card">
+    <h2>Силлогизм <span class="note" id="qNo"></span></h2>
+    <div class="syl" id="syl"></div>
+  </div>
+
+  <div class="card" id="form">
+    <div class="step" id="stTerms">
+      <h3>1. Термины</h3>
+      <div class="grid3">
+        <div class="field"><label class="l" for="selS">Меньший термин (S)</label><select id="selS"></select></div>
+        <div class="field"><label class="l" for="selM">Средний термин (M)</label><select id="selM"></select></div>
+        <div class="field"><label class="l" for="selP">Больший термин (P)</label><select id="selP"></select></div>
+      </div>
+      <div class="fb" id="fbTerms"></div>
+    </div>
+
+    <div class="step" id="stFig">
+      <h3>2. Фигура</h3>
+      <div class="seg" id="figs">
+        <input type="radio" name="fig" id="f1" value="1"><label for="f1">I</label>
+        <input type="radio" name="fig" id="f2" value="2"><label for="f2">II</label>
+        <input type="radio" name="fig" id="f3" value="3"><label for="f3">III</label>
+        <input type="radio" name="fig" id="f4" value="4"><label for="f4">IV</label>
+      </div>
+      <div class="fb" id="fbFig"></div>
+    </div>
+
+    <div class="step" id="stMood">
+      <h3>3. Модус</h3>
+      <div class="grid3">
+        <div class="field"><label class="l" for="m0">Большая посылка</label><select id="m0"></select></div>
+        <div class="field"><label class="l" for="m1">Меньшая посылка</label><select id="m1"></select></div>
+        <div class="field"><label class="l" for="m2">Заключение</label><select id="m2"></select></div>
+      </div>
+      <div class="fb" id="fbMood"></div>
+    </div>
+
+    <div class="step" id="stValid">
+      <h3>4. Правильность</h3>
+      <div class="seg">
+        <input type="radio" name="val" id="vOk" value="valid"><label for="vOk">Правильный</label>
+        <input type="radio" name="val" id="vBad" value="invalid"><label for="vBad">Неправильный</label>
+      </div>
+      <div class="fb" id="fbValid"></div>
+    </div>
+
+    <div class="step hidden" id="stErr">
+      <h3>5. Какие правила нарушены?</h3>
+      <div class="rules" id="errList"></div>
+      <div class="fb" id="fbErr"></div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="btnCheck" disabled>Проверить</button>
+      <button id="btnSkip">Пропустить</button>
+      <button class="primary hidden" id="btnNext">Следующий силлогизм →</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="explain"></div>
+  </div>
+
+  <div id="tab2" class="hidden">
+    <div class="stats">
+      <span class="chip">Решено: <b id="enN">0</b></span>
+      <span class="chip">Полностью верно: <b id="enOk">0</b></span>
+      <span class="chip">Серия: <b id="enStreak">0</b></span>
+      <span class="chip">Лучшая серия: <b id="enBest">0</b></span>
+    </div>
+
+    <details class="box">
+      <summary>Настройки</summary>
+      <div class="opts">
+        <label><input type="checkbox" id="enLetters"> буквенные термины (X, Y, Z)</label>
+      </div>
+    </details>
+
+    <details class="box">
+      <summary>Справка: как восстанавливать энтимему</summary>
+      <p><b>Энтимема</b> — сокращённый силлогизм, в котором пропущена одна из посылок или заключение.</p>
+      <p>Чтобы восстановить её, нужно найти суждение, которое вместе с имеющимися образует <b>правильный</b> силлогизм: определите термины и фигуру, а затем проверьте кандидата по общим правилам:</p>
+      <ol id="enRulesRef"></ol>
+      <p class="note">Верных вариантов может быть несколько (например, суждения E и I обратимы, а из общего суждения следует частное). Иногда ни одно суждение с данными терминами не даёт правильного силлогизма — тогда энтимему восстановить нельзя.</p>
+      <p><b>Непустота терминов и ослабленные модусы.</b> Как и в традиционной силлогистике, все термины считаются <b>непустыми</b>: предполагается, что предметы, о которых идёт речь, существуют. Поэтому из общего суждения следует частное («Все S суть P» ⇒ «Некоторые S суть P»), и правильными признаются 24 модуса, а не 15:</p>
+      <ul>
+        <li><b>ослабленные модусы</b> дают частное заключение там, где можно было вывести общее: Barbari (I, AAI), Celaront (I, EAO), Cesaro (II, EAO), Camestrop (II, AEO), Camenop (IV, AEO);</li>
+        <li>модусы, где из двух общих посылок выводится частное заключение, а общего вывода нет: Darapti (III, AAI), Felapton (III, EAO), Bramantip (IV, AAI), Fesapo (IV, EAO).</li>
+      </ul>
+      <p class="note">Если допускать пустые термины (как в современной логике), эти 9 модусов перестают быть правильными. Общие правила силлогизма неявно опираются на непустоту терминов, поэтому в тренажёре они считаются правильными.</p>
+    </details>
+
+    <div class="card">
+      <h2>Энтимема <span class="note" id="enNo"></span></h2>
+      <div class="syl" id="enSyl"></div>
+    </div>
+
+    <div class="card" id="enForm">
+      <h3 style="margin:0 0 4px;font-size:1rem">Какое суждение можно восстановить?</h3>
+      <p class="note" style="margin:0 0 10px">Выберите все подходящие варианты: каждый должен превращать энтимему в правильный силлогизм.</p>
+      <div class="rules" id="enOpts"></div>
+      <div class="actions">
+        <button class="primary" id="enCheck" disabled>Проверить</button>
+        <button id="enSkip">Пропустить</button>
+        <button class="primary hidden" id="enNext">Следующая энтимема →</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="enExplain"></div>
+  </div>
+</div>
+
+<script>
+// ---------- Логика силлогистики ----------
+const TYPES = {
+  A:{neg:false, part:false, sd:true,  pd:false},
+  E:{neg:true,  part:false, sd:true,  pd:true},
+  I:{neg:false, part:true,  sd:false, pd:false},
+  O:{neg:true,  part:true,  sd:false, pd:true}
+};
+const FIG = {
+  1:{maj:['M','P'], min:['S','M']},
+  2:{maj:['P','M'], min:['S','M']},
+  3:{maj:['M','P'], min:['M','S']},
+  4:{maj:['P','M'], min:['M','S']}
+};
+const NAMES = {
+  '1AAA':'Barbara','1EAE':'Celarent','1AII':'Darii','1EIO':'Ferio','1AAI':'Barbari','1EAO':'Celaront',
+  '2EAE':'Cesare','2AEE':'Camestres','2EIO':'Festino','2AOO':'Baroco','2EAO':'Cesaro','2AEO':'Camestrop',
+  '3AAI':'Darapti','3IAI':'Disamis','3AII':'Datisi','3EAO':'Felapton','3OAO':'Bocardo','3EIO':'Ferison',
+  '4AAI':'Bramantip','4AEE':'Camenes','4IAI':'Dimaris','4EAO':'Fesapo','4EIO':'Fresison','4AEO':'Camenop'
+};
+const RULES = [
+  {id:'middle',   title:'Средний термин не распределён ни в одной из посылок',
+                  rule:'Средний термин должен быть распределён хотя бы в одной из посылок.'},
+  {id:'major',    title:'Больший термин не распределён в посылке, но распределён в заключении',
+                  rule:'Термин, не распределённый в посылке, не может быть распределён в заключении (больший термин).'},
+  {id:'minor',    title:'Меньший термин не распределён в посылке, но распределён в заключении',
+                  rule:'Термин, не распределённый в посылке, не может быть распределён в заключении (меньший термин).'},
+  {id:'twoNeg',   title:'Обе посылки отрицательные',
+                  rule:'Из двух отрицательных посылок вывод невозможен.'},
+  {id:'negConcl', title:'Одна посылка отрицательная, а заключение утвердительное',
+                  rule:'Если одна из посылок отрицательная, то и заключение отрицательное.'},
+  {id:'twoPart',  title:'Обе посылки частные',
+                  rule:'Из двух частных посылок вывод невозможен.'},
+  {id:'partConcl',title:'Одна посылка частная, а заключение общее',
+                  rule:'Если одна из посылок частная, то и заключение частное.'},
+  {id:'affNeg',   title:'Обе посылки утвердительные, а заключение отрицательное',
+                  rule:'Из двух утвердительных посылок нельзя получить отрицательное заключение.'}
+];
+
+function analyze(fig, mood){
+  const f = FIG[fig];
+  const maj = {k:'maj', type:mood[0], s:f.maj[0], p:f.maj[1]};
+  const min = {k:'min', type:mood[1], s:f.min[0], p:f.min[1]};
+  const con = {k:'con', type:mood[2], s:'S',       p:'P'};
+  const dist = (pr,t) => pr.s===t ? TYPES[pr.type].sd : pr.p===t ? TYPES[pr.type].pd : false;
+  const neg  = pr => TYPES[pr.type].neg;
+  const part = pr => TYPES[pr.type].part;
+  const v = [];
+  if(!dist(maj,'M') && !dist(min,'M')) v.push('middle');
+  if(dist(con,'P') && !dist(maj,'P'))  v.push('major');
+  if(dist(con,'S') && !dist(min,'S'))  v.push('minor');
+  if(neg(maj) && neg(min))             v.push('twoNeg');
+  if(neg(maj)!==neg(min) && !neg(con)) v.push('negConcl');
+  if(part(maj) && part(min))           v.push('twoPart');
+  if(part(maj)!==part(min) && !part(con)) v.push('partConcl');
+  if(!neg(maj) && !neg(min) && neg(con))  v.push('affNeg');
+  return {props:[maj,min,con], viol:v, valid:v.length===0};
+}
+
+const ALL = [];
+for(const fig of [1,2,3,4])
+  for(const a of 'AEIO') for(const b of 'AEIO') for(const c of 'AEIO'){
+    const mood = a+b+c;
+    ALL.push({fig, mood, valid:analyze(fig,mood).valid});
+  }
+</script>
+
+<script>
+// ---------- Интерфейс ----------
+const POOL = ['студенты','философы','математики','поэты','врачи','спортсмены','хищники','птицы','рыбы',
+  'млекопитающие','растения','деревья','металлы','газы','планеты','лжецы','учёные','художники','судьи',
+  'музыканты','писатели','инженеры','школьники','города','реки','книги','герои','политики','мыслители','насекомые'];
+// творительный падеж — для связки «являются»
+const INS = {'студенты':'студентами','философы':'философами','математики':'математиками','поэты':'поэтами','врачи':'врачами',
+  'спортсмены':'спортсменами','хищники':'хищниками','птицы':'птицами','рыбы':'рыбами','млекопитающие':'млекопитающими',
+  'растения':'растениями','деревья':'деревьями','металлы':'металлами','газы':'газами','планеты':'планетами','лжецы':'лжецами',
+  'учёные':'учёными','художники':'художниками','судьи':'судьями','музыканты':'музыкантами','писатели':'писателями',
+  'инженеры':'инженерами','школьники':'школьниками','города':'городами','реки':'реками','книги':'книгами','герои':'героями',
+  'политики':'политиками','мыслители':'мыслителями','насекомые':'насекомыми'};
+const ROLE_LABEL = {S:'Меньший термин (S)', M:'Средний термин (M)', P:'Больший термин (P)'};
+const PROP_LABEL = {maj:'Большая посылка', min:'Меньшая посылка', con:'Заключение'};
+const TYPE_OPT = {A:'A — все S суть P', E:'E — никакие S не суть P', I:'I — некоторые S суть P', O:'O — некоторые S не суть P'};
+const ROMAN = {1:'I',2:'II',3:'III',4:'IV'};
+
+const $ = id => document.getElementById(id);
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
+
+let q = null, locked = false;
+const stats = {n:0, ok:0, streak:0, best:0};
+
+function termHTML(text, d, marks){
+  const t = '<span class="t">'+text+'</span>';
+  return marks ? t + '<sup class="'+(d?'dp':'dm')+'">'+(d?'+':'−')+'</sup>' : t;
+}
+// Связка выбирается для каждого суждения: «суть», «являются» (творительный падеж) или тире / без связки.
+// Выбор детерминирован (зависит от terms._seed и самого суждения), чтобы в вопросе и разборе формулировка совпадала.
+function styleOf(pr, terms){
+  const key = String(terms._seed||0)+pr.type+pr.s+pr.p;
+  let h = 0; for(const ch of key) h = (h*31 + ch.charCodeAt(0)) >>> 0;
+  return h % 3;
+}
+function propHTML(pr, terms, marks){
+  const T = TYPES[pr.type], st = styleOf(pr, terms);
+  const s = termHTML(terms[pr.s], T.sd, marks);
+  const p = termHTML(terms[pr.p], T.pd, marks);
+  const pi = termHTML(INS[terms[pr.p]] || terms[pr.p], T.pd, marks);
+  const F = [
+    {A:'Все '+s+' суть '+p,        E:'Никакие '+s+' не суть '+p,        I:'Некоторые '+s+' суть '+p,        O:'Некоторые '+s+' не суть '+p},
+    {A:'Все '+s+' являются '+pi,   E:'Никакие '+s+' не являются '+pi,   I:'Некоторые '+s+' являются '+pi,   O:'Некоторые '+s+' не являются '+pi},
+    {A:'Все '+s+' — '+p,           E:'Никакие '+s+' не '+p,             I:'Некоторые '+s+' — '+p,           O:'Некоторые '+s+' не '+p}
+  ];
+  return F[st][pr.type];
+}
+const schemeOf = pr => pr.s+' – '+pr.p;
+
+function fillSelect(sel, items, placeholder){
+  sel.innerHTML = '';
+  const o = document.createElement('option'); o.value=''; o.textContent=placeholder; sel.appendChild(o);
+  for(const [v,l] of items){ const e=document.createElement('option'); e.value=v; e.textContent=l; sel.appendChild(e); }
+}
+
+function newQuestion(){
+  const wantValid = Math.random()<0.45;
+  let pool = ALL.filter(c => c.valid===wantValid);
+  if(q && pool.length>1) pool = pool.filter(c => !(c.fig===q.fig && c.mood===q.mood));
+  const c = pick(pool);
+  const an = analyze(c.fig, c.mood);
+  const names = $('optLetters').checked ? shuffle(['X','Y','Z']) : shuffle(POOL).slice(0,3);
+  q = {fig:c.fig, mood:c.mood, an, valid:c.valid, viol:an.viol,
+       terms:{S:names[0], M:names[1], P:names[2], _seed:Math.random()}, swap:$('optSwap').checked && Math.random()<0.5,
+       options:shuffle(names)};
+  locked = false;
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const [maj,min,con] = q.an.props;
+  const order = q.swap ? [min,maj] : [maj,min];
+  $('syl').innerHTML =
+    order.map((pr,i)=>'<div class="prem"><span class="n">'+(i+1)+'</span><div>'+propHTML(pr,q.terms,false)+'.</div></div>').join('') +
+    '<div class="prem concl"><span class="n">∴</span><div>'+propHTML(con,q.terms,false)+'.</div></div>';
+  $('qNo').textContent = '№ '+(stats.n+1);
+
+  for(const r of ['S','M','P']) fillSelect($('sel'+r), q.options.map(t=>[t,t]), '— выберите —');
+  for(let i=0;i<3;i++) fillSelect($('m'+i), Object.entries(TYPE_OPT), '—');
+  document.querySelectorAll('input[name=fig],input[name=val]').forEach(i=>i.checked=false);
+  $('errList').innerHTML = RULES.map(r =>
+    '<label><input type="checkbox" value="'+r.id+'"><span>'+r.title+'</span></label>').join('');
+  $('stErr').classList.add('hidden');
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('ok','bad'));
+  document.querySelectorAll('.fb').forEach(f=>{f.className='fb'; f.innerHTML='';});
+  $('explain').classList.add('hidden');
+  $('btnNext').classList.add('hidden');
+  $('btnCheck').classList.remove('hidden');
+  $('btnSkip').classList.remove('hidden');
+  setDisabled(false);
+  updateCheck();
+}
+
+function setDisabled(d){
+  document.querySelectorAll('#form select,#form input').forEach(e=>e.disabled=d);
+  if(!d) updateCheck();
+}
+
+function readAnswer(){
+  const fig = document.querySelector('input[name=fig]:checked');
+  const val = document.querySelector('input[name=val]:checked');
+  return {
+    S:$('selS').value, M:$('selM').value, P:$('selP').value,
+    fig: fig ? +fig.value : 0,
+    mood: $('m0').value+$('m1').value+$('m2').value,
+    val: val ? val.value : '',
+    errs: [...document.querySelectorAll('#errList input:checked')].map(i=>i.value)
+  };
+}
+function updateCheck(){
+  if(locked) return;
+  const a = readAnswer();
+  $('btnCheck').disabled = !(a.S && a.M && a.P && a.fig && a.mood.length===3 && a.val);
+  $('stErr').classList.toggle('hidden', a.val!=='invalid');
+}
+
+function say(id, kind, html){
+  const el = $(id); el.className = 'fb show '+kind; el.innerHTML = html;
+}
+function markStep(id, ok){ $(id).classList.add(ok?'ok':'bad'); }
+
+function check(){
+  const a = readAnswer();
+  const strict = $('optStrict').checked;
+  const r = {};
+
+  // термины
+  const tOK = {S:a.S===q.terms.S, M:a.M===q.terms.M, P:a.P===q.terms.P};
+  r.terms = tOK.S && tOK.M && tOK.P;
+  if(r.terms) say('fbTerms','ok','Верно.');
+  else{
+    const wrong = ['S','M','P'].filter(k=>!tOK[k]).map(k=>ROLE_LABEL[k]).join(', ');
+    say('fbTerms','bad','Ошибка: '+wrong+'.<br>Правильно: S — <b>'+q.terms.S+'</b> (субъект заключения), M — <b>'+q.terms.M+
+        '</b> (есть в посылках, нет в заключении), P — <b>'+q.terms.P+'</b> (предикат заключения).');
+  }
+  markStep('stTerms', r.terms);
+
+  // фигура
+  r.fig = a.fig===q.fig;
+  const f = FIG[q.fig];
+  if(r.fig) say('fbFig','ok','Верно: фигура '+ROMAN[q.fig]+' (M — '+(f.maj[0]==='M'?'субъект':'предикат')+
+    ' большей посылки, '+(f.min[0]==='M'?'субъект':'предикат')+' меньшей).');
+  else say('fbFig','bad','Фигура '+ROMAN[q.fig]+': большая посылка '+f.maj.join(' – ')+', меньшая '+f.min.join(' – ')+
+    '. Фигура определяется положением среднего термина в посылках.');
+  markStep('stFig', r.fig);
+
+  // модус
+  r.mood = a.mood===q.mood;
+  if(r.mood) say('fbMood','ok','Верно: '+q.mood+'.');
+  else say('fbMood','bad','Правильный модус: <b>'+q.mood+'</b>. Первая буква — большая посылка (содержит P «'+q.terms.P+
+    '»), вторая — меньшая (содержит S «'+q.terms.S+'»), третья — заключение.');
+  markStep('stMood', r.mood);
+
+  // правильность
+  r.valid = (a.val==='valid')===q.valid;
+  if(r.valid) say('fbValid','ok', q.valid ? 'Верно: силлогизм правильный.' : 'Верно: силлогизм неправильный.');
+  else say('fbValid','bad', q.valid ? 'Силлогизм правильный: ни одно правило не нарушено.' : 'Силлогизм неправильный: нарушены правила.');
+  markStep('stValid', r.valid);
+
+  // ошибки
+  r.err = true;
+  if(!q.valid){
+    const wrongSel = a.errs.filter(e=>!q.viol.includes(e));
+    const missing  = q.viol.filter(e=>!a.errs.includes(e));
+    const t = id => RULES.find(x=>x.id===id).title;
+    const ok = a.val==='invalid' && a.errs.length>0 && wrongSel.length===0 && (!strict || missing.length===0);
+    r.err = ok;
+    let html;
+    if(a.val!=='invalid') html = 'Нужно было указать нарушенные правила: <ul>'+q.viol.map(e=>'<li>'+t(e)+'</li>').join('')+'</ul>';
+    else if(ok){
+      html = 'Верно.'+(missing.length ? ' Дополнительно нарушено: '+missing.map(t).join('; ')+'.' : '');
+    } else {
+      html = '';
+      if(!a.errs.length) html += 'Не выбрано ни одного нарушения. ';
+      if(wrongSel.length) html += 'Не нарушены: '+wrongSel.map(t).join('; ')+'. ';
+      if(strict && missing.length) html += 'Пропущено: '+missing.map(t).join('; ')+'.';
+      if(!strict && !wrongSel.length && a.errs.length===0) html += 'Нарушены: '+q.viol.map(t).join('; ')+'.';
+    }
+    say('fbErr', ok ? (missing.length?'warn':'ok') : 'bad', html);
+    $('stErr').classList.remove('hidden');
+    markStep('stErr', ok);
+  }
+
+  const all = r.terms && r.fig && r.mood && r.valid && r.err;
+  stats.n++; if(all){stats.ok++; stats.streak++; stats.best=Math.max(stats.best,stats.streak);} else stats.streak=0;
+  renderStats();
+  renderExplain(all);
+
+  locked = true; setDisabled(true);
+  $('btnCheck').classList.add('hidden');
+  $('btnSkip').classList.add('hidden');
+  $('btnNext').classList.remove('hidden');
+  $('btnNext').focus();
+}
+
+function violDetail(id, T = q.terms, mood = q.mood){
+  switch(id){
+    case 'middle':  return 'Средний термин «'+T.M+'» не распределён ни в большей, ни в меньшей посылке.';
+    case 'major':   return 'Больший термин «'+T.P+'» распределён в заключении, но не распределён в большей посылке.';
+    case 'minor':   return 'Меньший термин «'+T.S+'» распределён в заключении, но не распределён в меньшей посылке.';
+    case 'twoNeg':  return 'Обе посылки отрицательные ('+mood[0]+' и '+mood[1]+').';
+    case 'negConcl':return 'Ровно одна посылка отрицательная, а заключение ('+mood[2]+') утвердительное.';
+    case 'twoPart': return 'Обе посылки частные ('+mood[0]+' и '+mood[1]+').';
+    case 'partConcl':return 'Ровно одна посылка частная, а заключение ('+mood[2]+') общее.';
+    case 'affNeg':  return 'Обе посылки утвердительные, а заключение ('+mood[2]+') отрицательное.';
+  }
+}
+
+function renderExplain(all){
+  const [maj,min,con] = q.an.props;
+  const name = NAMES[q.fig+q.mood];
+  let h = '<div class="verdict '+(all?'ok':'bad')+'">'+(all?'Всё верно!':'Есть ошибки — разберём.')+'</div>';
+  h += '<h2>Разбор</h2><div class="std">';
+  for(const pr of [maj,min,con])
+    h += '<div class="row"><span class="lbl">'+PROP_LABEL[pr.k]+' ('+pr.type+')</span><span>'+propHTML(pr,q.terms,true)+
+         '</span><span class="sch">'+schemeOf(pr)+'</span></div>';
+  h += '</div><p class="note"><span style="color:var(--ok)"><b>+</b></span> — термин распределён, '+
+       '<span style="color:var(--bad)"><b>−</b></span> — не распределён.</p>';
+  h += '<p>Фигура <b>'+ROMAN[q.fig]+'</b>, модус <b>'+q.mood+'</b>'+(name ? ' — традиционное название <b>'+name+'</b>' : '')+'.</p>';
+  h += '<ul class="rl">';
+  for(const r of RULES){
+    const bad = q.viol.includes(r.id);
+    h += '<li class="'+(bad?'v':'')+'">'+(bad?'✗ ':'✓ ')+r.rule+(bad?'<small>'+violDetail(r.id)+'</small>':'')+'</li>';
+  }
+  h += '</ul>';
+  h += q.valid
+    ? '<p><b>Вывод:</b> ни одно правило не нарушено — силлогизм правильный.</p>'
+    : '<p><b>Вывод:</b> силлогизм неправильный: нарушено правил — '+q.viol.length+'.</p>';
+  $('explain').innerHTML = h;
+  $('explain').classList.remove('hidden');
+}
+
+function renderStats(){
+  $('stN').textContent = stats.n; $('stOk').textContent = stats.ok;
+  $('stStreak').textContent = stats.streak; $('stBest').textContent = stats.best;
+}
+
+$('rulesRef').innerHTML = RULES.map(r=>'<li>'+r.rule+'</li>').join('');
+$('form').addEventListener('input', updateCheck);
+$('form').addEventListener('change', updateCheck);
+$('btnCheck').addEventListener('click', check);
+$('btnNext').addEventListener('click', newQuestion);
+$('btnSkip').addEventListener('click', newQuestion);
+$('optLetters').addEventListener('change', newQuestion);
+renderStats();
+newQuestion();
+</script>
+<script>
+// ---------- Энтимема ----------
+// p1, p2 — посылки, c — заключение; каждое {type, s, p}, где s/p — буквы S, M, P исходной разметки
+function evalTriple(p1, p2, c){
+  const S = c.s, P = c.p;
+  const maj = [p1,p2].find(x => x.s===P || x.p===P);
+  const min = maj===p1 ? p2 : p1;
+  if(!maj || !(min.s===S || min.p===S)) return null;
+  const M = maj.s===P ? maj.p : maj.s;
+  const fig = maj.s===M ? (min.s===S ? 1 : 3) : (min.s===S ? 2 : 4);
+  const mood = maj.type+min.type+c.type;
+  return {S, M, P, fig, mood, maj, min, conc:c, an:analyze(fig,mood)};
+}
+function candidatesFor(a, b){
+  const out = [];
+  for(const [s,p] of [[a,b],[b,a]]) for(const type of 'AEIO') out.push({type, s, p});
+  return out;
+}
+
+const EN_ALL = [];
+for(const fig of [1,2,3,4])
+  for(const a of 'AEIO') for(const b of 'AEIO') for(const c of 'AEIO'){
+    const props = analyze(fig, a+b+c).props;
+    for(let i=0;i<3;i++){
+      const miss = props[i], given = props.filter((_,j)=>j!==i);
+      const cands = candidatesFor(miss.s, miss.p).map(cd => {
+        const res = i===2 ? evalTriple(given[0], given[1], cd) : evalTriple(given[0], cd, given[1]);
+        return {...cd, res, valid: !!res && res.an.valid};
+      });
+      EN_ALL.push({fig, mood:a+b+c, missing:i, cands});
+    }
+  }
+
+let en = null;
+const enStats = {n:0, ok:0, streak:0, best:0};
+
+function newEnth(){
+  const want = Math.random() < 0.6;
+  let pool = EN_ALL.filter(x => x.cands.some(c=>c.valid)===want);
+  if(en && pool.length>1) pool = pool.filter(x => x!==en.item);
+  const item = pick(pool);
+  const names = $('enLetters').checked ? shuffle(['X','Y','Z']) : shuffle(POOL).slice(0,3);
+  const terms = {S:names[0], M:names[1], P:names[2], _seed:Math.random()};
+  const valid = item.cands.filter(c=>c.valid), inval = item.cands.filter(c=>!c.valid);
+  const total = Math.max(5, valid.length+2);
+  const opts = shuffle(valid.concat(shuffle(inval).slice(0, total-valid.length)));
+  en = {item, terms, opts, restorable: valid.length>0, locked:false};
+  renderEnth();
+}
+
+function renderEnth(){
+  const {item, terms} = en;
+  const props = analyze(item.fig, item.mood).props;
+  const blank = '<span class="blank">?</span>';
+  $('enSyl').innerHTML = props.map((pr,i) => {
+    const body = i===item.missing ? blank : propHTML(pr, terms, false)+'.';
+    return '<div class="prem'+(i===2?' concl':'')+'"><span class="n">'+(i===2?'∴':i+1)+'</span><div>'+body+'</div></div>';
+  }).join('');
+  $('enNo').textContent = '№ '+(enStats.n+1);
+  $('enOpts').innerHTML = en.opts.map((o,k) =>
+    '<label class="opt"><input type="checkbox" value="'+k+'"><span>'+propHTML(o, terms, false)+'.<small class="why"></small></span></label>'
+  ).join('') +
+    '<label class="opt"><input type="checkbox" value="none"><span><b>Энтимему нельзя восстановить</b><small class="why"></small></span></label>';
+  $('enExplain').classList.add('hidden');
+  $('enNext').classList.add('hidden');
+  $('enCheck').classList.remove('hidden');
+  $('enSkip').classList.remove('hidden');
+  $('enCheck').disabled = true;
+}
+
+function enChange(ev){
+  if(en.locked) return;
+  const t = ev.target;
+  if(t.checked){
+    document.querySelectorAll('#enOpts input').forEach(i => {
+      if(i!==t && ((t.value==='none') !== (i.value==='none'))) i.checked = false;
+    });
+  }
+  $('enCheck').disabled = !document.querySelector('#enOpts input:checked');
+}
+
+function roleTerms(res){ return {S:en.terms[res.S], M:en.terms[res.M], P:en.terms[res.P]}; }
+
+function checkEnth(){
+  const inputs = [...document.querySelectorAll('#enOpts input')];
+  const chosen = new Set(inputs.filter(i=>i.checked).map(i=>i.value));
+  const none = chosen.has('none');
+  const all = en.restorable ? (!none && en.opts.every((o,k) => o.valid===chosen.has(String(k)))) : none;
+
+  inputs.forEach(inp => {
+    const lab = inp.closest('label'), why = lab.querySelector('.why');
+    const sel = inp.checked;
+    let correct, text;
+    if(inp.value==='none'){
+      correct = !en.restorable;
+      text = correct ? 'Ни одно суждение с этими терминами не даёт правильного силлогизма.'
+                     : 'Восстановить можно: есть суждения, дающие правильный силлогизм.';
+    } else {
+      const o = en.opts[+inp.value]; correct = o.valid;
+      const r = o.res, name = NAMES[r.fig+r.mood];
+      text = correct
+        ? '✓ Правильный силлогизм: фигура '+ROMAN[r.fig]+', модус '+r.mood+(name?' ('+name+')':'')+'.'
+        : '✗ Фигура '+ROMAN[r.fig]+', модус '+r.mood+'. '+r.an.viol.map(id => violDetail(id, roleTerms(r), r.mood)).join(' ');
+    }
+    why.textContent = text;
+    lab.classList.add(correct ? (sel ? 'good' : 'miss') : (sel ? 'wrong' : 'plain'));
+    inp.disabled = true;
+  });
+
+  enStats.n++;
+  if(all){enStats.ok++; enStats.streak++; enStats.best=Math.max(enStats.best,enStats.streak);} else enStats.streak=0;
+  $('enN').textContent=enStats.n; $('enOk').textContent=enStats.ok;
+  $('enStreak').textContent=enStats.streak; $('enBest').textContent=enStats.best;
+
+  let h = '<div class="verdict '+(all?'ok':'bad')+'">'+(all?'Всё верно!':'Есть ошибки — разберём.')+'</div>';
+  const MISS = ['большая посылка','меньшая посылка','заключение'][en.item.missing];
+  if(en.restorable){
+    const good = en.opts.filter(o=>o.valid);
+    h += '<p>Пропущена <b>'+MISS+'</b>. Правильных вариантов: '+good.length+'. Зелёные — выбраны верно, жёлтые — верные, но пропущенные, красные — выбраны ошибочно.</p>';
+    h += '<h2>Восстановленные силлогизмы</h2>';
+    for(const o of good){
+      const r = o.res;
+      h += '<div class="std">';
+      for(const [lbl,pr] of [['Большая посылка',r.maj],['Меньшая посылка',r.min],['Заключение',r.conc]])
+        h += '<div class="row"><span class="lbl">'+lbl+' ('+pr.type+')</span><span>'+propHTML(pr,en.terms,true)+'</span></div>';
+      h += '<div class="row"><span class="lbl"></span><span class="note">Фигура '+ROMAN[r.fig]+', модус '+r.mood+(NAMES[r.fig+r.mood]?' — '+NAMES[r.fig+r.mood]:'')+'</span></div></div>';
+    }
+  } else {
+    h += '<p>Пропущена <b>'+MISS+'</b>. Перебор всех восьми суждений с этими терминами (A, E, I, O в обоих направлениях) показывает, что каждое из них нарушает хотя бы одно общее правило. Поэтому энтимему восстановить нельзя.</p>';
+  }
+  $('enExplain').innerHTML = h;
+  $('enExplain').classList.remove('hidden');
+
+  en.locked = true;
+  $('enCheck').classList.add('hidden');
+  $('enSkip').classList.add('hidden');
+  $('enNext').classList.remove('hidden');
+  $('enNext').focus();
+}
+
+function showTab(n){
+  $('tab1').classList.toggle('hidden', n!==1);
+  $('tab2').classList.toggle('hidden', n!==2);
+  $('tabBtn1').setAttribute('aria-selected', n===1);
+  $('tabBtn2').setAttribute('aria-selected', n===2);
+}
+$('tabBtn1').addEventListener('click', ()=>showTab(1));
+$('tabBtn2').addEventListener('click', ()=>showTab(2));
+$('enRulesRef').innerHTML = RULES.map(r=>'<li>'+r.rule+'</li>').join('');
+$('enOpts').addEventListener('change', enChange);
+$('enCheck').addEventListener('click', checkEnth);
+$('enNext').addEventListener('click', newEnth);
+$('enSkip').addEventListener('click', newEnth);
+$('enLetters').addEventListener('change', newEnth);
+newEnth();
+</script>
+</body>
+</html>
