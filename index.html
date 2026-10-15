@@ -123,6 +123,7 @@ code{font-family:ui-monospace,Menlo,monospace}
   <div class="tabs" role="tablist">
     <button role="tab" id="tabBtn1" aria-selected="true">Силлогизм</button>
     <button role="tab" id="tabBtn2" aria-selected="false">Энтимема</button>
+    <button role="tab" id="tabBtn3" aria-selected="false">Сорит</button>
   </div>
 
   <div id="tab1">
@@ -295,6 +296,67 @@ code{font-family:ui-monospace,Menlo,monospace}
 
     <div class="card hidden" id="enExplain"></div>
   </div>
+
+  <div id="tab3" class="hidden">
+    <div class="stats">
+      <span class="chip">Решено: <b id="sorN">0</b></span>
+      <span class="chip">Полностью верно: <b id="sorOk">0</b></span>
+      <span class="chip">Серия: <b id="sorStreak">0</b></span>
+      <span class="chip">Лучшая серия: <b id="sorBest">0</b></span>
+    </div>
+
+    <details class="box">
+      <summary>Настройки</summary>
+      <div class="opts">
+        <label>Термины
+          <select id="sorLex" style="width:auto">
+            <option value="normal">обычные (студенты, поэты…)</option>
+            <option value="counter">контрфактические (все крокодилы летают)</option>
+            <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
+            <option value="letters">буквенные (X, Y, Z…)</option>
+          </select>
+        </label>
+        <label>Посылок
+          <select id="sorCount" style="width:auto">
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="mix">3 или 4</option>
+          </select>
+        </label>
+      </div>
+    </details>
+
+    <details class="box">
+      <summary>Справка: как восстанавливать сорит</summary>
+      <p><b>Сорит</b> — сложносокращённый силлогизм: цепочка силлогизмов, в которой промежуточные заключения пропущены. Соседние посылки имеют общий термин, а заключение связывает первый и последний термины цепочки.</p>
+      <ul>
+        <li><b>Аристотелев сорит</b> начинается с посылки, содержащей субъект заключения: «Все S суть M₁. Все M₁ суть M₂. Все M₂ суть P. ⇒ Все S суть P».</li>
+        <li><b>Гоклениев сорит</b> начинается с посылки, содержащей предикат заключения: «Все M₂ суть P. Все M₁ суть M₂. Все S суть M₁. ⇒ Все S суть P».</li>
+      </ul>
+      <p>Сорит правильный, если его можно разложить на цепочку <b>правильных</b> силлогизмов: каждое промежуточное заключение вместе со следующей посылкой даёт следующее заключение. Каждый силлогизм проверяется по общим правилам:</p>
+      <ol id="sorRulesRef"></ol>
+      <p class="note">Для сорита в стандартной форме (как в примерах выше) есть удобные частные правила. В аристотелевом сорите отрицательной может быть только последняя посылка, а частной — только первая. В гоклениевом — наоборот: отрицательной может быть только первая, частной — только последняя.</p>
+      <p class="note">Все термины считаются непустыми, поэтому допускаются и ослабленные модусы. Верных вариантов может быть несколько, а может не быть ни одного — тогда сорит восстановить нельзя.</p>
+    </details>
+
+    <div class="card">
+      <h2>Сорит <span class="note" id="sorNo"></span></h2>
+      <div class="syl" id="sorSyl"></div>
+    </div>
+
+    <div class="card" id="sorForm">
+      <h3 style="margin:0 0 4px;font-size:1rem">Какое суждение можно восстановить?</h3>
+      <p class="note" style="margin:0 0 10px">Выберите все подходящие варианты: каждый должен превращать сорит в правильное рассуждение.</p>
+      <div class="rules" id="sorOpts"></div>
+      <div class="actions">
+        <button class="primary" id="sorCheck" disabled>Проверить</button>
+        <button id="sorSkip">Пропустить</button>
+        <button class="primary hidden" id="sorNext">Следующий сорит →</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="sorExplain"></div>
+  </div>
 </div>
 
 <script>
@@ -400,14 +462,14 @@ const VERB = {'летающие существа':'летают','говорящ
   'скрипачи':'играют на скрипке','жители Луны':'живут на Луне','шоколадные предметы':'сделаны из шоколада',
   'любители чая':'любят чай','шахматисты':'играют в шахматы','облачные жители':'живут на облаках'};
 
-function pickNames(mode){
-  if(mode==='letters')  return shuffle(['X','Y','Z']);
-  if(mode==='nonsense') return shuffle(NONSENSE).slice(0,3);
+function pickNames(mode, n = 3){
+  if(mode==='letters')  return shuffle(n===3 ? ['X','Y','Z'] : ['X','Y','Z','U','V','W']).slice(0,n);
+  if(mode==='nonsense') return shuffle(NONSENSE).slice(0,n);
   if(mode==='counter'){
-    const k = Math.random()<0.5 ? 1 : 2;
-    return shuffle(shuffle(CF_PROPS).slice(0,k).concat(shuffle(CF_NOUNS).slice(0,3-k)));
+    const k = n>3 ? 2 : (Math.random()<0.5 ? 1 : 2);
+    return shuffle(shuffle(CF_PROPS).slice(0,k).concat(shuffle(CF_NOUNS).slice(0,n-k)));
   }
-  return shuffle(POOL).slice(0,3);
+  return shuffle(POOL).slice(0,n);
 }
 const ROLE_LABEL = {S:'Меньший термин (S)', M:'Средний термин (M)', P:'Больший термин (P)'};
 const PROP_LABEL = {maj:'Большая посылка', min:'Меньшая посылка', con:'Заключение'};
@@ -790,11 +852,12 @@ function checkEnth(){
 }
 
 function showTab(n){
-  $('tab1').classList.toggle('hidden', n!==1);
-  $('tab2').classList.toggle('hidden', n!==2);
-  $('tabBtn1').setAttribute('aria-selected', n===1);
-  $('tabBtn2').setAttribute('aria-selected', n===2);
+  for(const k of [1,2,3]){
+    $('tab'+k).classList.toggle('hidden', n!==k);
+    $('tabBtn'+k).setAttribute('aria-selected', n===k);
+  }
 }
+$('tabBtn3').addEventListener('click', ()=>showTab(3));
 $('tabBtn1').addEventListener('click', ()=>showTab(1));
 $('tabBtn2').addEventListener('click', ()=>showTab(2));
 $('enRulesRef').innerHTML = RULES.map(r=>'<li>'+r.rule+'</li>').join('');
@@ -804,6 +867,177 @@ $('enNext').addEventListener('click', newEnth);
 $('enSkip').addEventListener('click', newEnth);
 $('enLex').addEventListener('change', newEnth);
 newEnth();
+</script>
+<script>
+// ---------- Сорит ----------
+// Термины цепочки обозначаются T0…Tn; посылка i связывает Ti и T(i+1), заключение — T0 и Tn.
+const propKey = pr => pr.type+pr.s+'|'+pr.p;
+function randType(){ const r = Math.random(); return r<0.55 ? 'A' : r<0.75 ? 'E' : r<0.9 ? 'I' : 'O'; }
+
+// Все суждения о (T0, Tn), выводимые из посылок цепочкой правильных силлогизмов.
+// Узел: {pr, prem} — посылка, или {pr, from:[a,b], res} — заключение силлогизма из a и b.
+function derivable(prems){
+  const n = prems.length, R = {}, K = (i,j) => i+','+j;
+  for(let i=0;i<n;i++) R[K(i,i+1)] = new Map([[propKey(prems[i]), {pr:prems[i], prem:i}]]);
+  for(let len=2; len<=n; len++) for(let i=0; i+len<=n; i++){
+    const j = i+len, out = new Map();
+    for(let k=i+1;k<j;k++) for(const a of R[K(i,k)].values()) for(const b of R[K(k,j)].values())
+      for(const c of candidatesFor('T'+i, 'T'+j)){
+        const key = propKey(c);
+        if(out.has(key)) continue;
+        const res = evalTriple(a.pr, b.pr, c);
+        if(res && res.an.valid) out.set(key, {pr:c, from:[a,b], res});
+      }
+    R[K(i,j)] = out;
+  }
+  return R[K(0,n)];
+}
+
+function genSorites(n, wantRest){
+  let last = null;
+  for(let t=0; t<4000; t++){
+    const prems = [];
+    for(let i=0;i<n;i++){
+      const fwd = Math.random()<0.8;
+      prems.push({type:randType(), s:'T'+(fwd?i:i+1), p:'T'+(fwd?i+1:i)});
+    }
+    const conc = {type:randType(), s:'T0', p:'T'+n};
+    const missing = Math.floor(Math.random()*(n+1));          // n — пропущено заключение
+    const pair = missing===n ? ['T0','T'+n] : ['T'+missing, 'T'+(missing+1)];
+    const cands = candidatesFor(...pair).map(cd => {
+      const P = prems.slice(); let C = conc;
+      if(missing===n) C = cd; else P[missing] = cd;
+      const node = derivable(P).get(propKey(C));
+      return {...cd, valid:!!node, node};
+    });
+    last = {n, prems, conc, missing, cands};
+    if(cands.some(c=>c.valid)===wantRest) return last;
+  }
+  return last;
+}
+
+let sor = null;
+const sorStats = {n:0, ok:0, streak:0, best:0};
+
+function newSorites(){
+  const cnt = $('sorCount').value, n = cnt==='mix' ? (Math.random()<0.5 ? 3 : 4) : +cnt;
+  const item = genSorites(n, Math.random()<0.6);
+  const names = pickNames($('sorLex').value, n+1);
+  const terms = {_seed:Math.random()};
+  names.forEach((nm,i) => terms['T'+i] = nm);
+  const valid = item.cands.filter(c=>c.valid), inval = item.cands.filter(c=>!c.valid);
+  const total = Math.max(5, valid.length+2);
+  const opts = shuffle(valid.concat(shuffle(inval).slice(0, total-valid.length)));
+  sor = {item, terms, opts, restorable:valid.length>0, goclenian:Math.random()<0.3, locked:false};
+  renderSorites();
+}
+
+function renderSorites(){
+  const {item, terms} = sor, n = item.n;
+  const blank = '<span class="blank">?</span>';
+  let idx = [...Array(n).keys()];
+  if(sor.goclenian) idx.reverse();
+  $('sorSyl').innerHTML = idx.map((i,k) =>
+      '<div class="prem"><span class="n">'+(k+1)+'</span><div>'+(i===item.missing ? blank : propHTML(item.prems[i], terms, false)+'.')+'</div></div>'
+    ).join('') +
+    '<div class="prem concl"><span class="n">∴</span><div>'+(item.missing===n ? blank : propHTML(item.conc, terms, false)+'.')+'</div></div>';
+  $('sorNo').textContent = '№ '+(sorStats.n+1);
+  $('sorOpts').innerHTML = sor.opts.map((o,k) =>
+    '<label class="opt"><input type="checkbox" value="'+k+'"><span>'+propHTML(o, terms, false)+'.<small class="why"></small></span></label>'
+  ).join('') +
+    '<label class="opt"><input type="checkbox" value="none"><span><b>Сорит нельзя восстановить</b><small class="why"></small></span></label>';
+  $('sorExplain').classList.add('hidden');
+  $('sorNext').classList.add('hidden');
+  $('sorCheck').classList.remove('hidden');
+  $('sorSkip').classList.remove('hidden');
+  $('sorCheck').disabled = true;
+}
+
+function sorChange(ev){
+  if(sor.locked) return;
+  const t = ev.target;
+  if(t.checked) document.querySelectorAll('#sorOpts input').forEach(i => {
+    if(i!==t && ((t.value==='none') !== (i.value==='none'))) i.checked = false;
+  });
+  $('sorCheck').disabled = !document.querySelector('#sorOpts input:checked');
+}
+
+// Промежуточные силлогизмы вывода в порядке выполнения
+function chainSteps(node, acc = []){
+  if(node.from){ chainSteps(node.from[0], acc); chainSteps(node.from[1], acc); acc.push(node); }
+  return acc;
+}
+const moodLabel = r => r.mood + (NAMES[r.fig+r.mood] ? ' ('+NAMES[r.fig+r.mood]+')' : '');
+
+function checkSorites(){
+  const inputs = [...document.querySelectorAll('#sorOpts input')];
+  const chosen = new Set(inputs.filter(i=>i.checked).map(i=>i.value));
+  const none = chosen.has('none');
+  const all = sor.restorable ? (!none && sor.opts.every((o,k) => o.valid===chosen.has(String(k)))) : none;
+  const missConc = sor.item.missing===sor.item.n;
+
+  inputs.forEach(inp => {
+    const lab = inp.closest('label'), why = lab.querySelector('.why');
+    let correct, text;
+    if(inp.value==='none'){
+      correct = !sor.restorable;
+      text = correct ? 'Ни одно суждение с этими терминами не делает сорит правильным.'
+                     : 'Восстановить можно: есть суждения, дающие правильный сорит.';
+    } else {
+      const o = sor.opts[+inp.value]; correct = o.valid;
+      text = correct
+        ? '✓ Цепочка правильных силлогизмов: '+chainSteps(o.node).map(st => moodLabel(st.res)).join(' → ')+'.'
+        : (missConc ? '✗ Не выводится из посылок: ни одна цепочка правильных силлогизмов к нему не приводит.'
+                    : '✗ С этой посылкой ни одна цепочка правильных силлогизмов не приводит к заключению.');
+    }
+    why.textContent = text;
+    lab.classList.add(correct ? (inp.checked ? 'good' : 'miss') : (inp.checked ? 'wrong' : 'plain'));
+    inp.disabled = true;
+  });
+
+  sorStats.n++;
+  if(all){sorStats.ok++; sorStats.streak++; sorStats.best=Math.max(sorStats.best,sorStats.streak);} else sorStats.streak=0;
+  $('sorN').textContent=sorStats.n; $('sorOk').textContent=sorStats.ok;
+  $('sorStreak').textContent=sorStats.streak; $('sorBest').textContent=sorStats.best;
+
+  const T = sor.terms;
+  let h = '<div class="verdict '+(all?'ok':'bad')+'">'+(all?'Всё верно!':'Есть ошибки — разберём.')+'</div>';
+  h += '<p>'+(sor.goclenian ? 'Гоклениев' : 'Аристотелев')+' сорит, пропущено '+(missConc ? '<b>заключение</b>' : '<b>посылка</b>')+'. ';
+  if(sor.restorable){
+    const good = sor.opts.filter(o=>o.valid);
+    h += 'Правильных вариантов: '+good.length+'. Зелёные — выбраны верно, жёлтые — верные, но пропущенные, красные — выбраны ошибочно.</p>';
+    h += '<h2>Разложение на силлогизмы</h2>';
+    for(const o of good){
+      h += '<div class="std"><div class="row"><span class="lbl">Вариант</span><span>'+propHTML(o,T,false)+'</span></div>';
+      chainSteps(o.node).forEach((st,k) => {
+        const r = st.res;
+        h += '<div class="row"><span class="lbl">Силлогизм '+(k+1)+'</span><span>'+propHTML(r.maj,T,true)+'; '+propHTML(r.min,T,true)+
+             ' ⇒ <b>'+propHTML(r.conc,T,true)+'</b><br><span class="note">Фигура '+ROMAN[r.fig]+', модус '+moodLabel(r)+'</span></span></div>';
+      });
+      h += '</div>';
+    }
+    h += '<p class="note">В каждом силлогизме сначала записана большая посылка, затем меньшая. <span style="color:var(--ok)"><b>+</b></span> — термин распределён, <span style="color:var(--bad)"><b>−</b></span> — не распределён.</p>';
+  } else {
+    h += 'Перебор всех восьми суждений с нужными терминами (A, E, I, O в обоих направлениях) показывает, что ни одно из них не позволяет построить цепочку правильных силлогизмов. Поэтому сорит восстановить нельзя.</p>';
+  }
+  $('sorExplain').innerHTML = h;
+  $('sorExplain').classList.remove('hidden');
+
+  sor.locked = true;
+  $('sorCheck').classList.add('hidden');
+  $('sorSkip').classList.add('hidden');
+  $('sorNext').classList.remove('hidden');
+  $('sorNext').focus();
+}
+
+$('sorRulesRef').innerHTML = RULES.map(r=>'<li>'+r.rule+'</li>').join('');
+$('sorOpts').addEventListener('change', sorChange);
+$('sorCheck').addEventListener('click', checkSorites);
+$('sorNext').addEventListener('click', newSorites);
+$('sorSkip').addEventListener('click', newSorites);
+$('sorLex').addEventListener('change', newSorites);
+$('sorCount').addEventListener('change', newSorites);
+newSorites();
 </script>
 <script>
 // ---------- Тема оформления ----------
