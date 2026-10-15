@@ -17,6 +17,14 @@
     --ok:#6fcf8f; --ok-bg:#1d3326; --bad:#ff8a80; --bad-bg:#3a2321; --warn:#f0c36a; --warn-bg:#3a3018;
   }
 }
+:root[data-theme="dark"]{
+    --bg:#16171a; --card:#202225; --ink:#ececea; --muted:#9a9a94; --line:#383a3f;
+    --accent:#7fa8e6; --accent-ink:#101418; --accent-soft:#25303f;
+    --ok:#6fcf8f; --ok-bg:#1d3326; --bad:#ff8a80; --bad-bg:#3a2321; --warn:#f0c36a; --warn-bg:#3a3018;
+}
+:root{color-scheme:light dark}
+:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="dark"]{color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 .wrap{max-width:780px;margin:0 auto;padding:20px 16px 60px}
@@ -92,11 +100,24 @@ code{font-family:ui-monospace,Menlo,monospace}
 .opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
 .opt.miss{border-color:var(--warn);background:var(--warn-bg)}
 .std+.std{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.themes{display:inline-flex;border:1.5px solid var(--line);border-radius:8px;overflow:hidden;flex:none}
+.themes button{border:0;border-radius:0;background:transparent;color:var(--muted);padding:6px 12px;font-size:.9rem}
+.themes button+button{border-left:1.5px solid var(--line)}
+.themes button:hover{color:var(--accent)}
+.themes button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Тренажёр по силлогистике</h1>
+  <div class="top">
+    <h1>Тренажёр по силлогистике</h1>
+    <div class="themes" role="group" aria-label="Тема оформления">
+      <button type="button" data-theme-set="auto">Авто</button>
+      <button type="button" data-theme-set="light">Светлая</button>
+      <button type="button" data-theme-set="dark">Тёмная</button>
+    </div>
+  </div>
   <p class="sub">Тренажёр по категорическим силлогизмам.</p>
 
   <div class="tabs" role="tablist">
@@ -116,7 +137,14 @@ code{font-family:ui-monospace,Menlo,monospace}
     <summary>Настройки</summary>
     <div class="opts">
       <label><input type="checkbox" id="optSwap"> посылки в произвольном порядке</label>
-      <label><input type="checkbox" id="optLetters"> буквенные термины (X, Y, Z)</label>
+      <label>Термины
+        <select id="optLex" style="width:auto">
+          <option value="normal">обычные (студенты, поэты…)</option>
+          <option value="counter">контрфактические (все крокодилы летают)</option>
+          <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
+          <option value="letters">буквенные (X, Y, Z)</option>
+        </select>
+      </label>
       <label><input type="checkbox" id="optStrict"> требовать все нарушенные правила</label>
     </div>
   </details>
@@ -142,7 +170,7 @@ code{font-family:ui-monospace,Menlo,monospace}
     <p><b>Модус</b> — тройка типов суждений: большая посылка, меньшая посылка, заключение (например, AAI).</p>
     <p><b>Общие правила.</b></p>
     <ol id="rulesRef"></ol>
-    <p class="note">Правильность силлогизма определяется только его формой: истинность посылок по существу не оценивается.</p>
+    <p class="note">Правильность силлогизма определяется только его формой: истинность посылок по существу не оценивается. Чтобы потренироваться отделять форму от содержания, в настройках можно выбрать контрфактические («Все крокодилы летают») или бессмысленные («Все трямзики — кракозябры») термины.</p>
     <p><b>Непустота терминов и ослабленные модусы.</b> Как и в традиционной силлогистике, все термины считаются <b>непустыми</b>: предполагается, что предметы, о которых идёт речь, существуют. Поэтому из общего суждения следует частное («Все S суть P» ⇒ «Некоторые S суть P»), и правильными признаются 24 модуса, а не 15:</p>
     <ul>
       <li><b>ослабленные модусы</b> дают частное заключение там, где можно было вывести общее: Barbari (I, AAI), Celaront (I, EAO), Cesaro (II, EAO), Camestrop (II, AEO), Camenop (IV, AEO);</li>
@@ -224,7 +252,14 @@ code{font-family:ui-monospace,Menlo,monospace}
     <details class="box">
       <summary>Настройки</summary>
       <div class="opts">
-        <label><input type="checkbox" id="enLetters"> буквенные термины (X, Y, Z)</label>
+        <label>Термины
+          <select id="enLex" style="width:auto">
+            <option value="normal">обычные (студенты, поэты…)</option>
+            <option value="counter">контрфактические (все крокодилы летают)</option>
+            <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
+            <option value="letters">буквенные (X, Y, Z)</option>
+          </select>
+        </label>
       </div>
     </details>
 
@@ -341,6 +376,39 @@ const INS = {'студенты':'студентами','философы':'фи�
   'учёные':'учёными','художники':'художниками','судьи':'судьями','музыканты':'музыкантами','писатели':'писателями',
   'инженеры':'инженерами','школьники':'школьниками','города':'городами','реки':'реками','книги':'книгами','герои':'героями',
   'политики':'политиками','мыслители':'мыслителями','насекомые':'насекомыми'};
+
+// Контрфактические термины: животные и предметы + свойства, которых у них заведомо нет.
+const CF_NOUNS = ['крокодилы','пингвины','коровы','киты','слоны','кошки','черепахи','камни','деревья','жирафы','улитки','рыбы'];
+const CF_PROPS = ['летающие существа','говорящие существа','грамотеи','скрипачи','жители Луны',
+  'шоколадные предметы','любители чая','шахматисты','облачные жители'];
+// Бессмысленные термины
+const NONSENSE = ['трямзики','кракозябры','бутявки','глокие куздры','бокры','шорьки','мюмзики','зелюки','бармаглоты',
+  'хрюкотаны','брындики','бокрёнки','фуфлыжки','кузявки','пырчики','тумбрики'];
+Object.assign(INS, {
+  'крокодилы':'крокодилами','пингвины':'пингвинами','коровы':'коровами','киты':'китами','слоны':'слонами','кошки':'кошками',
+  'черепахи':'черепахами','камни':'камнями','жирафы':'жирафами','улитки':'улитками',
+  'летающие существа':'летающими существами','говорящие существа':'говорящими существами',
+  'грамотеи':'грамотеями','скрипачи':'скрипачами','жители Луны':'жителями Луны',
+  'шоколадные предметы':'шоколадными предметами','любители чая':'любителями чая','шахматисты':'шахматистами',
+  'облачные жители':'облачными жителями',
+  'трямзики':'трямзиками','кракозябры':'кракозябрами','бутявки':'бутявками','глокие куздры':'глокими куздрами',
+  'бокры':'бокрами','шорьки':'шорьками','мюмзики':'мюмзиками','зелюки':'зелюками','бармаглоты':'бармаглотами',
+  'хрюкотаны':'хрюкотанами','брындики':'брындиками','бокрёнки':'бокрёнками','фуфлыжки':'фуфлыжками',
+  'кузявки':'кузявками','пырчики':'пырчиками','тумбрики':'тумбриками'});
+// Глагольная форма сказуемого: «Все крокодилы летают»
+const VERB = {'летающие существа':'летают','говорящие существа':'умеют говорить','грамотеи':'умеют читать',
+  'скрипачи':'играют на скрипке','жители Луны':'живут на Луне','шоколадные предметы':'сделаны из шоколада',
+  'любители чая':'любят чай','шахматисты':'играют в шахматы','облачные жители':'живут на облаках'};
+
+function pickNames(mode){
+  if(mode==='letters')  return shuffle(['X','Y','Z']);
+  if(mode==='nonsense') return shuffle(NONSENSE).slice(0,3);
+  if(mode==='counter'){
+    const k = Math.random()<0.5 ? 1 : 2;
+    return shuffle(shuffle(CF_PROPS).slice(0,k).concat(shuffle(CF_NOUNS).slice(0,3-k)));
+  }
+  return shuffle(POOL).slice(0,3);
+}
 const ROLE_LABEL = {S:'Меньший термин (S)', M:'Средний термин (M)', P:'Больший термин (P)'};
 const PROP_LABEL = {maj:'Большая посылка', min:'Меньшая посылка', con:'Заключение'};
 const TYPE_OPT = {A:'A — все S суть P', E:'E — никакие S не суть P', I:'I — некоторые S суть P', O:'O — некоторые S не суть P'};
@@ -369,6 +437,11 @@ function propHTML(pr, terms, marks){
   const s = termHTML(terms[pr.s], T.sd, marks);
   const p = termHTML(terms[pr.p], T.pd, marks);
   const pi = termHTML(INS[terms[pr.p]] || terms[pr.p], T.pd, marks);
+  const verb = VERB[terms[pr.p]];
+  if(verb && st!==0){   // «Все крокодилы летают» вместо «Все крокодилы — летающие существа»
+    const v = termHTML(verb, T.pd, marks);
+    return {A:'Все '+s+' '+v, E:'Никакие '+s+' не '+v, I:'Некоторые '+s+' '+v, O:'Некоторые '+s+' не '+v}[pr.type];
+  }
   const F = [
     {A:'Все '+s+' суть '+p,        E:'Никакие '+s+' не суть '+p,        I:'Некоторые '+s+' суть '+p,        O:'Некоторые '+s+' не суть '+p},
     {A:'Все '+s+' являются '+pi,   E:'Никакие '+s+' не являются '+pi,   I:'Некоторые '+s+' являются '+pi,   O:'Некоторые '+s+' не являются '+pi},
@@ -390,7 +463,7 @@ function newQuestion(){
   if(q && pool.length>1) pool = pool.filter(c => !(c.fig===q.fig && c.mood===q.mood));
   const c = pick(pool);
   const an = analyze(c.fig, c.mood);
-  const names = $('optLetters').checked ? shuffle(['X','Y','Z']) : shuffle(POOL).slice(0,3);
+  const names = pickNames($('optLex').value);
   q = {fig:c.fig, mood:c.mood, an, valid:c.valid, viol:an.viol,
        terms:{S:names[0], M:names[1], P:names[2], _seed:Math.random()}, swap:$('optSwap').checked && Math.random()<0.5,
        options:shuffle(names)};
@@ -572,7 +645,7 @@ $('form').addEventListener('change', updateCheck);
 $('btnCheck').addEventListener('click', check);
 $('btnNext').addEventListener('click', newQuestion);
 $('btnSkip').addEventListener('click', newQuestion);
-$('optLetters').addEventListener('change', newQuestion);
+$('optLex').addEventListener('change', newQuestion);
 renderStats();
 newQuestion();
 </script>
@@ -617,7 +690,7 @@ function newEnth(){
   let pool = EN_ALL.filter(x => x.cands.some(c=>c.valid)===want);
   if(en && pool.length>1) pool = pool.filter(x => x!==en.item);
   const item = pick(pool);
-  const names = $('enLetters').checked ? shuffle(['X','Y','Z']) : shuffle(POOL).slice(0,3);
+  const names = pickNames($('enLex').value);
   const terms = {S:names[0], M:names[1], P:names[2], _seed:Math.random()};
   const valid = item.cands.filter(c=>c.valid), inval = item.cands.filter(c=>!c.valid);
   const total = Math.max(5, valid.length+2);
@@ -729,8 +802,21 @@ $('enOpts').addEventListener('change', enChange);
 $('enCheck').addEventListener('click', checkEnth);
 $('enNext').addEventListener('click', newEnth);
 $('enSkip').addEventListener('click', newEnth);
-$('enLetters').addEventListener('change', newEnth);
+$('enLex').addEventListener('change', newEnth);
 newEnth();
+</script>
+<script>
+// ---------- Тема оформления ----------
+function applyTheme(t){
+  if(t==='light' || t==='dark') document.documentElement.setAttribute('data-theme', t);
+  else { t = 'auto'; document.documentElement.removeAttribute('data-theme'); }
+  document.querySelectorAll('[data-theme-set]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.themeSet===t)));
+  try { localStorage.setItem('syl-theme', t); } catch(e) {}
+}
+document.querySelectorAll('[data-theme-set]').forEach(b => b.addEventListener('click', () => applyTheme(b.dataset.themeSet)));
+let savedTheme = 'auto';
+try { savedTheme = localStorage.getItem('syl-theme') || 'auto'; } catch(e) {}
+applyTheme(savedTheme);
 </script>
 </body>
 </html>
