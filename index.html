@@ -140,7 +140,7 @@ code{font-family:ui-monospace,Menlo,monospace}
       <label><input type="checkbox" id="optSwap"> посылки в произвольном порядке</label>
       <label>Термины
         <select id="optLex" style="width:auto">
-          <option value="normal">обычные (студенты, поэты…)</option>
+          <option value="normal">естественные (все физики — учёные)</option>
           <option value="counter">контрфактические (все крокодилы летают)</option>
           <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
           <option value="letters">буквенные (X, Y, Z)</option>
@@ -255,7 +255,7 @@ code{font-family:ui-monospace,Menlo,monospace}
       <div class="opts">
         <label>Термины
           <select id="enLex" style="width:auto">
-            <option value="normal">обычные (студенты, поэты…)</option>
+            <option value="normal">естественные (все физики — учёные)</option>
             <option value="counter">контрфактические (все крокодилы летают)</option>
             <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
             <option value="letters">буквенные (X, Y, Z)</option>
@@ -310,7 +310,7 @@ code{font-family:ui-monospace,Menlo,monospace}
       <div class="opts">
         <label>Термины
           <select id="sorLex" style="width:auto">
-            <option value="normal">обычные (студенты, поэты…)</option>
+            <option value="normal">естественные (все физики — учёные)</option>
             <option value="counter">контрфактические (все крокодилы летают)</option>
             <option value="nonsense">бессмысленные (все трямзики — кракозябры)</option>
             <option value="letters">буквенные (X, Y, Z…)</option>
@@ -471,6 +471,161 @@ function pickNames(mode, n = 3){
   }
   return shuffle(POOL).slice(0,n);
 }
+
+// ---------- Естественные термины ----------
+// Каждое понятие — множество «атомов» (видов предметов) своей предметной области.
+// Термины подбираются так, чтобы суждения были истинны: «Все физики — учёные», «Некоторые птицы не летают».
+function domainFromAtoms(atoms, defs){
+  const idx = Object.fromEntries(atoms.map((a,i)=>[a,i]));
+  const c = {};
+  for(const [nom, ins, list] of defs){
+    let m = 0n;
+    for(const a of list){ if(!(a in idx)) throw new Error('нет атома '+a); m |= 1n << BigInt(idx[a]); }
+    c[nom] = m; INS[nom] = ins;
+  }
+  return {c};
+}
+function domainFromNumbers(max, defs){
+  const c = {};
+  for(const [nom, ins, pred] of defs){
+    let m = 0n;
+    for(let k=1;k<=max;k++) if(pred(k)) m |= 1n << BigInt(k);
+    c[nom] = m; INS[nom] = ins;
+  }
+  return {c};
+}
+const isPrime = k => { if(k<2) return false; for(let d=2; d*d<=k; d++) if(k%d===0) return false; return true; };
+const FIB = new Set([1,2,3,5,8,13,21,34,55,89]);
+
+const MAMMALS = ['собака','кошка','волк','лев','корова','лошадь','кит','дельфин','летучая мышь'];
+const BIRDS = ['орёл','воробей','пингвин','страус','курица'];
+const FISH = ['акула','карп','лосось'];
+const REPT = ['змея','крокодил','черепаха'];
+const INSECTS = ['пчела','муравей','бабочка'];
+const ANIMALS = [...MAMMALS, ...BIRDS, ...FISH, ...REPT, 'лягушка', ...INSECTS, 'паук'];
+
+const SCI = ['физик-преподаватель','физик-исследователь','химик-преподаватель','химик-исследователь','биолог',
+             'математик-преподаватель','математик-исследователь'];
+const PEOPLE = [...SCI, 'школьный учитель','писатель','поэт','композитор','пианист','скрипач','хирург','терапевт',
+                'судья','адвокат','инженер'];
+
+const SHAPES = ['квадрат','прямоугольник','ромб','параллелограмм','трапеция','четырёхугольник',
+                'правильный треугольник','равнобедренный треугольник','прямоугольный равнобедренный треугольник',
+                'прямоугольный треугольник','разносторонний треугольник','правильный шестиугольник','пятиугольник','круг','овал'];
+const TRI = ['правильный треугольник','равнобедренный треугольник','прямоугольный равнобедренный треугольник',
+             'прямоугольный треугольник','разносторонний треугольник'];
+
+const DOMAINS = [
+  domainFromAtoms(ANIMALS, [
+    ['животные','животными', ANIMALS],
+    ['млекопитающие','млекопитающими', MAMMALS],
+    ['птицы','птицами', BIRDS],
+    ['рыбы','рыбами', FISH],
+    ['пресмыкающиеся','пресмыкающимися', REPT],
+    ['насекомые','насекомыми', INSECTS],
+    ['позвоночные','позвоночными', [...MAMMALS, ...BIRDS, ...FISH, ...REPT, 'лягушка']],
+    ['беспозвоночные','беспозвоночными', [...INSECTS, 'паук']],
+    ['теплокровные','теплокровными', [...MAMMALS, ...BIRDS]],
+    ['хладнокровные','хладнокровными', [...FISH, ...REPT, 'лягушка', ...INSECTS, 'паук']],
+    ['хищники','хищниками', ['волк','лев','кошка','акула','орёл','крокодил','змея','паук']],
+    ['травоядные','травоядными', ['корова','лошадь']],
+    ['кошачьи','кошачьими', ['кошка','лев']],
+    ['морские животные','морскими животными', ['кит','дельфин','акула']],
+    ['домашние животные','домашними животными', ['собака','кошка','корова','лошадь','курица']],
+    ['летающие существа','летающими существами', ['орёл','воробей','летучая мышь','пчела','бабочка']]
+  ]),
+  domainFromAtoms(PEOPLE, [
+    ['люди','людьми', PEOPLE],
+    ['учёные','учёными', SCI],
+    ['естествоиспытатели','естествоиспытателями', SCI.filter(a=>!a.startsWith('математик'))],
+    ['физики','физиками', ['физик-преподаватель','физик-исследователь']],
+    ['химики','химиками', ['химик-преподаватель','химик-исследователь']],
+    ['математики','математиками', ['математик-преподаватель','математик-исследователь']],
+    ['преподаватели','преподавателями', ['физик-преподаватель','химик-преподаватель','математик-преподаватель','школьный учитель']],
+    ['врачи','врачами', ['хирург','терапевт']],
+    ['хирурги','хирургами', ['хирург']],
+    ['музыканты','музыкантами', ['композитор','пианист','скрипач']],
+    ['литераторы','литераторами', ['писатель','поэт']],
+    ['поэты','поэтами', ['поэт']],
+    ['деятели искусства','деятелями искусства', ['писатель','поэт','композитор','пианист','скрипач']],
+    ['юристы','юристами', ['судья','адвокат']],
+    ['судьи','судьями', ['судья']],
+    ['инженеры','инженерами', ['инженер']]
+  ]),
+  domainFromNumbers(99, [
+    ['натуральные числа','натуральными числами', k=>true],
+    ['чётные числа','чётными числами', k=>k%2===0],
+    ['нечётные числа','нечётными числами', k=>k%2===1],
+    ['простые числа','простыми числами', isPrime],
+    ['составные числа','составными числами', k=>k>1 && !isPrime(k)],
+    ['однозначные числа','однозначными числами', k=>k<10],
+    ['двузначные числа','двузначными числами', k=>k>=10],
+    ['точные квадраты','точными квадратами', k=>Number.isInteger(Math.sqrt(k))],
+    ['степени двойки','степенями двойки', k=>(k & (k-1))===0],
+    ['числа Фибоначчи','числами Фибоначчи', k=>FIB.has(k)],
+    ['делители шестидесяти','делителями шестидесяти', k=>60%k===0]
+  ]),
+  domainFromAtoms(SHAPES, [
+    ['геометрические фигуры','геометрическими фигурами', SHAPES],
+    ['многоугольники','многоугольниками', SHAPES.filter(a=>a!=='круг' && a!=='овал')],
+    ['четырёхугольники','четырёхугольниками', ['квадрат','прямоугольник','ромб','параллелограмм','трапеция','четырёхугольник']],
+    ['параллелограммы','параллелограммами', ['квадрат','прямоугольник','ромб','параллелограмм']],
+    ['прямоугольники','прямоугольниками', ['квадрат','прямоугольник']],
+    ['ромбы','ромбами', ['квадрат','ромб']],
+    ['квадраты','квадратами', ['квадрат']],
+    ['трапеции','трапециями', ['трапеция']],
+    ['треугольники','треугольниками', TRI],
+    ['равнобедренные треугольники','равнобедренными треугольниками', ['правильный треугольник','равнобедренный треугольник','прямоугольный равнобедренный треугольник']],
+    ['прямоугольные треугольники','прямоугольными треугольниками', ['прямоугольный равнобедренный треугольник','прямоугольный треугольник']],
+    ['правильные многоугольники','правильными многоугольниками', ['квадрат','правильный треугольник','правильный шестиугольник']],
+    ['круги','кругами', ['круг']],
+    ['кривые фигуры','кривыми фигурами', ['круг','овал']]
+  ])
+];
+
+// strict: частные суждения I и O должны быть «естественными» — есть и те, что подпадают, и те, что нет.
+function holds(type, a, b, strict){
+  const ov = (a & b) !== 0n, sub = (a & ~b) === 0n;
+  switch(type){
+    case 'A': return sub;
+    case 'E': return !ov;
+    case 'I': return ov && (!strict || !sub);
+    case 'O': return !sub && (!strict || ov);
+  }
+}
+function solveNatural(roles, props, strict){
+  for(const D of shuffle(DOMAINS)){
+    const names = shuffle(Object.keys(D.c));
+    if(names.length < roles.length) continue;
+    const asg = {}, used = new Set(); let nodes = 0;
+    const bt = i => {
+      if(i===roles.length) return true;
+      if(++nodes > 20000) return false;
+      for(const nm of names){
+        if(used.has(nm)) continue;
+        asg[roles[i]] = nm; used.add(nm);
+        const good = props.every(pr => !(pr.s in asg && pr.p in asg) || holds(pr.type, D.c[asg[pr.s]], D.c[asg[pr.p]], strict));
+        if(good && bt(i+1)) return true;
+        delete asg[roles[i]]; used.delete(nm);
+      }
+      return false;
+    };
+    if(bt(0)) return asg;
+  }
+  return null;
+}
+// Имена терминов в порядке roles. В режиме «естественные» сначала требуем истинности всех суждений,
+// затем — только видимых (например, посылок неправильного силлогизма).
+function chooseTerms(mode, roles, props, visible){
+  if(mode==='normal'){
+    const vis = props.filter((_,i) => visible.includes(i));
+    for(const [ps, strict] of [[props,true],[props,false],[vis,true],[vis,false]]){
+      const a = solveNatural(roles, ps, strict);
+      if(a) return roles.map(r => a[r]);
+    }
+  }
+  return pickNames(mode, roles.length);
+}
 const ROLE_LABEL = {S:'Меньший термин (S)', M:'Средний термин (M)', P:'Больший термин (P)'};
 const PROP_LABEL = {maj:'Большая посылка', min:'Меньшая посылка', con:'Заключение'};
 const TYPE_OPT = {A:'A — все S суть P', E:'E — никакие S не суть P', I:'I — некоторые S суть P', O:'O — некоторые S не суть P'};
@@ -525,7 +680,7 @@ function newQuestion(){
   if(q && pool.length>1) pool = pool.filter(c => !(c.fig===q.fig && c.mood===q.mood));
   const c = pick(pool);
   const an = analyze(c.fig, c.mood);
-  const names = pickNames($('optLex').value);
+  const names = chooseTerms($('optLex').value, ['S','M','P'], an.props, [0,1]);
   q = {fig:c.fig, mood:c.mood, an, valid:c.valid, viol:an.viol,
        terms:{S:names[0], M:names[1], P:names[2], _seed:Math.random()}, swap:$('optSwap').checked && Math.random()<0.5,
        options:shuffle(names)};
@@ -752,7 +907,7 @@ function newEnth(){
   let pool = EN_ALL.filter(x => x.cands.some(c=>c.valid)===want);
   if(en && pool.length>1) pool = pool.filter(x => x!==en.item);
   const item = pick(pool);
-  const names = pickNames($('enLex').value);
+  const names = chooseTerms($('enLex').value, ['S','M','P'], analyze(item.fig, item.mood).props, [0,1,2].filter(i=>i!==item.missing));
   const terms = {S:names[0], M:names[1], P:names[2], _seed:Math.random()};
   const valid = item.cands.filter(c=>c.valid), inval = item.cands.filter(c=>!c.valid);
   const total = Math.max(5, valid.length+2);
@@ -922,7 +1077,8 @@ const sorStats = {n:0, ok:0, streak:0, best:0};
 function newSorites(){
   const cnt = $('sorCount').value, n = cnt==='mix' ? (Math.random()<0.5 ? 3 : 4) : +cnt;
   const item = genSorites(n, Math.random()<0.6);
-  const names = pickNames($('sorLex').value, n+1);
+  const names = chooseTerms($('sorLex').value, [...Array(n+1).keys()].map(i=>'T'+i), item.prems.concat([item.conc]),
+                            [...Array(n+1).keys()].filter(i=>i!==item.missing));
   const terms = {_seed:Math.random()};
   names.forEach((nm,i) => terms['T'+i] = nm);
   const valid = item.cands.filter(c=>c.valid), inval = item.cands.filter(c=>!c.valid);
